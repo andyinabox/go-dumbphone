@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Directions</title>
+    <style>
+       img { display: block; margin: 10px 0; }
+      ol { margin: 0; padding: 0; list-style-position: inside; }
+      ol ol, ol ul {
+        padding-left: 5px;
+      }
+      th { text-align: left; vertical-align: top; }
+      tr { border-bottom: 1px solid #ddd; }
+      table { margin-bottom: 10px; }
+    </style>
+  </head>
+  <body>
+
+    {{! there shouldn't really ever be more than one leg }}
+    {{#legs}}
+
+    <img src="data:image/png;base64,{{ overview_polyline.base64 }}">
+
+
+    <table>
+      <tbody>
+        <tr>
+          <th>From</th>
+          <td><b>{{ origin_name }}</b> ({{ start_address }})</td>
+        </tr>
+        <tr>
+          <th>To</th>
+          <td><b>{{ destination_name }}</b> ({{ end_address }})</td>
+        </tr>
+        <tr>
+          <th>Travel Mode</th>
+          <td>{{ travel_mode }} ({{ distance.text}})</td>
+        </tr>
+        <tr>
+          <th>Timing</th>
+          <td>{{ duration.text }} ({{ departure_time.text }} to {{ arrival_time.text }} )</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Summary</h2>
+
+    <ol>
+    {{#steps}}
+      <li>{{{ html_instructions }}}</li>
+    {{/steps}}
+    </ol>
+
+    <hr>
+
+    {{#include_details}}
+
+    <h2>Detailed Directions</h2>
+
+    <ol>
+    {{#steps}}
+      <br>
+      <img src="data:image/png;base64,{{ polyline.base64 }}">
+      <br>
+      <li>
+        {{#transit_details}}
+          <b style="color: {{line.text_color}}; background: {{ line.color }}">{{ line.short_name }}</b>
+        {{/transit_details}}
+
+        {{{ html_instructions }}}
+
+        {{#transit_details}}
+        <ul>
+          <li><b>{{ departure_stop.name }}</b> ({{ departure_time.text }})</li>
+          <li>{{ num_stops }} stops</li>
+          <li><b>{{ arrival_stop.name }}</b> ({{ arrival_time.text }})</li>
+        </ul>
+        {{/transit_details}}
+        <ol>
+          {{#sub_steps}}
+            <li>{{{ html_instructions }}}</li>
+          {{/sub_steps}}
+        </ol>
+      </li>
+    {{/steps}}
+    </ol>
+
+    {{/include_details}}
+
+  {{/legs}}
+
+  </body>
+</html>
