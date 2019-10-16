@@ -1,0 +1,10 @@
+{
+  "name": "go-dumbphone",
+  "version": "0.0.1",
+  "description": "Go dumbphone web interface",
+  "main": "web/app/App.js",
+  "repository": "git@github.com:andyinabox/go-dumbphone.git",
+  "author": "Andy Dayton <amdayton@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
