@@ -4,8 +4,13 @@ package directions
 
 import (
 	"context"
+	"encoding/base64"
+	"fmt"
+	"io/ioutil"
 	"log"
-	"strconv"
+	"net/http"
+	"os"
+	"strings"
 	"text/template"
 	"time"
 
@@ -14,22 +19,21 @@ import (
 
 const (
 	travelMode = "driving"
-	imgTpl     = "https://maps.googleapis.com/maps/api/staticmap?size=%dx%d&path=enc:%s&key="
+	imgURLStr  = "https://maps.googleapis.com/maps/api/staticmap?size=%dx%d&path=enc:%s&key=%s"
 	imgW, imgH = 230, 230
 )
 
 // GoogleMapsData data for google maps directions
 type GoogleMapsData struct {
-	APIKey      string
 	Origin      string
 	Destination string
 	Mode        string
 	Time        string
 }
 
-// Directions get directions for a set of directions data
-func Directions(data GoogleMapsData) []maps.Route {
-	c, err := maps.NewClient(maps.WithAPIKey(data.APIKey))
+// GetRoutes get directions for a set of directions data
+func GetRoutes(apiKey string, data GoogleMapsData) []maps.Route {
+	c, err := maps.NewClient(maps.WithAPIKey(apiKey))
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
@@ -39,10 +43,96 @@ func Directions(data GoogleMapsData) []maps.Route {
 		Mode:          maps.Mode(data.Mode),
 		DepartureTime: data.Time,
 	}
-	route, _, err := c.Directions(context.Background(), r)
+	routes, _, err := c.Directions(context.Background(), r)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
 
-	return route
+	return routes
+}
+
+// RouteSummary summary of a google route
+type RouteSummary struct {
+	Duration    time.Duration
+	Description string
+}
+
+// GetTransitRouteSummary get a summary of transit options
+func GetTransitRouteSummary(route maps.Route) RouteSummary {
+
+	duration := route.Legs[0].Duration
+	lines := make([]string, 0)
+
+	for _, step := range route.Legs[0].Steps {
+		if step.TransitDetails != nil {
+			line := step.TransitDetails.Line
+			var name string
+
+			if line.ShortName != "" {
+				name = line.ShortName
+			} else {
+				name = line.Name
+			}
+			lines = append(lines, name)
+		}
+	}
+
+	summary := RouteSummary{duration, strings.Join(lines, " > ")}
+
+	return summary
+}
+
+// GetRouteSummaries get summaries of each route
+func GetRouteSummaries(mode maps.Mode, routes []maps.Route) []RouteSummary {
+	summaries := make([]RouteSummary, 0)
+
+	for _, route := range routes {
+		if mode == maps.TravelModeTransit {
+			summaries = append(summaries, GetTransitRouteSummary(route))
+		} else {
+			summaries = append(summaries, RouteSummary{route.Legs[0].Duration, route.Summary})
+		}
+	}
+
+	return summaries
+}
+
+// RenderRoute render a given route
+func RenderRoute(route maps.Route, f *os.File) (*os.File, error) {
+
+	t, err := template.ParseFiles("directions.html")
+
+	if err != nil {
+		return f, err
+	}
+
+	err = t.Execute(f, route)
+
+	if err != nil {
+		return f, err
+	}
+
+	return f, nil
+}
+
+// MapImageBase64 take a map polyline and encode as Base64 image
+func MapImageBase64(apiKey string, polyline maps.Polyline) (string, error) {
+	imageURL := fmt.Sprintf(imgURLStr, imgW, imgH, polyline.Points, apiKey)
+
+	// get image url
+	resp, err := http.Get(imageURL)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// read response body into bytes
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	str := base64.StdEncoding.EncodeToString(body)
+
+	return str, nil
 }
