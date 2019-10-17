@@ -1,8 +1,13 @@
 package directions
 
 import (
+	"fmt"
 	"googlemaps.github.io/maps"
+	"os"
+	"os/exec"
+	"strconv"
 	"testing"
+	"time"
 )
 
 var testConfig Settings
@@ -21,6 +26,43 @@ func defaultMapData() GoogleMapsData {
 		Time:        "now",
 	}
 	return data
+}
+
+func previewB64(t *testing.T, b64 string) error {
+	name := strconv.FormatInt(time.Now().Unix(), 10)
+	filename := fmt.Sprintf("%s%s.html", os.TempDir(), name)
+	html := fmt.Sprintf("<img src=\"data:image/png;base64,%s\">", b64)
+
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	_, err = f.WriteString(html)
+	if err != nil {
+		return err
+	}
+
+	t.Logf("Created temp file: %s\n", filename)
+
+	cmd := exec.Command(
+		"open",
+		fmt.Sprintf("file://%s", filename),
+	)
+
+	err = cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // func openBrowser(url string) {
@@ -129,7 +171,12 @@ func TestBase64(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error encoding image: %s", err)
 	} else {
-		t.Log(b64)
+		if testing.Verbose() {
+			err = previewB64(t, b64)
+			if err != nil {
+				t.Logf("Error opening preview: %v\n", err)
+			}
+		}
 	}
 
 }

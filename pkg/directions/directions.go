@@ -82,6 +82,7 @@ type RouteSummary struct {
 	Description string
 }
 
+// ToString output string version of route summary
 func (r RouteSummary) ToString() string {
 	return fmt.Sprintf("%s (%v)", r.Description, r.Duration)
 }
