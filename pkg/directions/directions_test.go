@@ -1,13 +1,13 @@
 package directions
 
 import (
-	// "fmt"
+	"fmt"
 	// "googlemaps.github.io/maps"
-	// "os"
-	// "os/exec"
-	// "strconv"
+	"os"
+	"os/exec"
+	"strconv"
 	"testing"
-	// "time"
+	"time"
 )
 
 const APIKey = "AIzaSyCbLP2s621kGDdESEGvVW0bhO1qkSu7WjQ"
@@ -23,41 +23,41 @@ func defaultTrip() Trip {
 	return trip
 }
 
-// func previewB64(t *testing.T, b64 string) error {
-// 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-// 	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
-// 	html := fmt.Sprintf("<img src=\"data:image/png;base64,%s\">", b64)
+func previewB64(t *testing.T, b64 string) error {
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
+	html := fmt.Sprintf("<img src=\"data:image/png;base64,%s\">", b64)
 
-// 	f, err := os.Create(filename)
-// 	if err != nil {
-// 		return err
-// 	}
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
 
-// 	defer f.Close()
+	defer f.Close()
 
-// 	_, err = f.WriteString(html)
-// 	if err != nil {
-// 		return err
-// 	}
+	_, err = f.WriteString(html)
+	if err != nil {
+		return err
+	}
 
-// 	t.Logf("Created temp file: %s\n", filename)
+	t.Logf("Created temp file: %s\n", filename)
 
-// 	cmd := exec.Command(
-// 		"open",
-// 		fmt.Sprintf("file://%s", filename),
-// 	)
+	cmd := exec.Command(
+		"open",
+		fmt.Sprintf("file://%s", filename),
+	)
 
-// 	err = cmd.Run()
-// 	if err != nil {
-// 		return err
-// 	}
+	err = cmd.Run()
+	if err != nil {
+		return err
+	}
 
-// 	return nil
-// }
+	return nil
+}
 
-// func openBrowser(url string) {
-// 	exec.Command("open", url).Start()
-// }
+func openBrowser(url string) {
+	exec.Command("open", url).Start()
+}
 
 func TestConfig(t *testing.T) {
 
@@ -157,28 +157,28 @@ func TestTransitRouteSummaries(t *testing.T) {
 	}
 }
 
-// func TestBase64(t *testing.T) {
+func TestBase64(t *testing.T) {
 
-// 	routes, err := GetRoutes(defaultMapData())
+	trip := defaultTrip()
+	err := trip.Fetch()
 
-// 	if err != nil {
-// 		t.Errorf("Routes error: %s", err)
-// 	}
+	if err != nil {
+		t.Errorf("Fetch Error: %v", err)
+	}
 
-// 	b64, err := MapImageBase64(routes[0].OverviewPolyline)
+	b64, err := trip.PolyLineToB64(trip.Routes[0].OverviewPolyline)
 
-// 	if err != nil {
-// 		t.Errorf("Error encoding image: %s", err)
-// 	} else {
-// 		if testing.Verbose() {
-// 			err = previewB64(t, b64)
-// 			if err != nil {
-// 				t.Logf("Error opening preview: %v\n", err)
-// 			}
-// 		}
-// 	}
-
-// }
+	if err != nil {
+		t.Errorf("Error encoding image: %s", err)
+	} else {
+		if testing.Verbose() {
+			err = previewB64(t, b64)
+			if err != nil {
+				t.Logf("Error opening preview: %v\n", err)
+			}
+		}
+	}
+}
 
 // func TestRender(t *testing.T) {
 

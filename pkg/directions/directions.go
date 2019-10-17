@@ -127,6 +127,32 @@ func (t *Trip) Render(wr io.Writer, i int) error {
 	return nil
 }
 
+// PolyLineToB64 converts a polyline object to a base64 PNG string
+// using the Google static images API
+func (t *Trip) PolyLineToB64(polyline maps.Polyline) (string, error) {
+
+	// create static image url
+	imageURL := fmt.Sprintf(imgURLStr, imgW, imgH, polyline.Points, t.APIKey)
+
+	// get image
+	resp, err := http.Get(imageURL)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// read response body into bytes
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	// encode image
+	b64 := base64.StdEncoding.EncodeToString(body)
+
+	return b64, nil
+}
+
 // Convert route data for use in template
 func (t *Trip) getTemplateData(route maps.Route) (maps.Route, error) {
 	return route, nil
@@ -183,31 +209,6 @@ func (t *Trip) checkRequirements() error {
 	}
 
 	return nil
-}
-
-// Convert a polyline object to a base64 PNG string
-func (t *Trip) polyLineToB64(polyline maps.Polyline) (string, error) {
-
-	// create static image url
-	imageURL := fmt.Sprintf(imgURLStr, imgW, imgH, polyline.Points, t.APIKey)
-
-	// get image
-	resp, err := http.Get(imageURL)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	// read response body into bytes
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	// encode image
-	b64 := base64.StdEncoding.EncodeToString(body)
-
-	return b64, nil
 }
 
 // Create a route summary for transit route
