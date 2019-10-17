@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -48,6 +49,10 @@ func Configure(c *Settings) error {
 	}
 
 	return nil
+}
+
+func prepRouteForTemplate(route maps.Route) (maps.Route, error) {
+	return route, nil
 }
 
 // GetRoutes get directions for a set of directions data
@@ -130,18 +135,27 @@ func GetRouteSummaries(mode maps.Mode, routes []maps.Route) ([]RouteSummary, err
 }
 
 // RenderRoute render a given route
-func RenderRoute(route maps.Route, f *os.File) (*os.File, error) {
+func RenderRoute(route maps.Route) (*os.File, error) {
+
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
 
 	t, err := template.ParseFiles("directions.html")
-
 	if err != nil {
-		return f, err
+		return nil, err
 	}
+
+	f, err := os.Create(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	defer f.Close()
 
 	err = t.Execute(f, route)
 
 	if err != nil {
-		return f, err
+		return nil, err
 	}
 
 	return f, nil

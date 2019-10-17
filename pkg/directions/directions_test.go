@@ -29,8 +29,8 @@ func defaultMapData() GoogleMapsData {
 }
 
 func previewB64(t *testing.T, b64 string) error {
-	name := strconv.FormatInt(time.Now().Unix(), 10)
-	filename := fmt.Sprintf("%s%s.html", os.TempDir(), name)
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
 	html := fmt.Sprintf("<img src=\"data:image/png;base64,%s\">", b64)
 
 	f, err := os.Create(filename)
@@ -52,12 +52,7 @@ func previewB64(t *testing.T, b64 string) error {
 		fmt.Sprintf("file://%s", filename),
 	)
 
-	err = cmd.Start()
-	if err != nil {
-		return err
-	}
-
-	err = cmd.Wait()
+	err = cmd.Run()
 	if err != nil {
 		return err
 	}
