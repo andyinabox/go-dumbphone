@@ -50,21 +50,20 @@ func previewB64(t *testing.T, b64 string) error {
 
 	t.Logf("Created temp file: %s\n", filename)
 
-	cmd := exec.Command(
-		"open",
-		fmt.Sprintf("file://%s", filename),
-	)
+	err = openBrowser("file://" + filename)
 
-	err = cmd.Run()
+	return nil
+}
+
+func openBrowser(url string) error {
+	cmd := exec.Command("open", url)
+
+	err := cmd.Run()
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func openBrowser(url string) {
-	exec.Command("open", url).Start()
 }
 
 func TestConfig(t *testing.T) {
@@ -188,6 +187,29 @@ func TestBase64(t *testing.T) {
 	}
 }
 
-// func TestRender(t *testing.T) {
+func TestRender(t *testing.T) {
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
 
-// }
+	f, err := os.Create(filename)
+	defer f.Close()
+
+	if err != nil {
+		t.Errorf("File Error: %v", err)
+	}
+
+	trip := defaultTrip()
+	err = trip.Fetch()
+
+	if err != nil {
+		t.Errorf("Fetch Error: %v", err)
+	}
+
+	err = trip.Render(f, 0)
+	if err != nil {
+		t.Errorf("Rendering error: %v", err)
+	}
+
+	err = openBrowser("file://" + filename)
+
+}
