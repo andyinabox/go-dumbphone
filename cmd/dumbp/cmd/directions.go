@@ -1,12 +1,11 @@
 package cmd
 
 import (
-	// "errors"
 	"fmt"
 	"github.com/andyinabox/go-dumbphone/pkg/directions"
 	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli"
-	"googlemaps.github.io/maps"
+	"os"
 )
 
 func promptOrigin() (string, error) {
@@ -55,28 +54,23 @@ func promptMode() (int, string, error) {
 	return prompt.Run()
 }
 
-func promptRoutes(mode string, routes []maps.Route) (int, string, error) {
+func promptRoutes(t *directions.Trip) (int, string, error) {
 
-	var options = make([]string, 0)
+	var options = make([]string, len(t.Summaries))
 
-	summaries, err := directions.GetRouteSummaries(maps.Mode(mode), routes)
-	if err != nil {
-		return -1, "", err
-	}
-
-	for _, s := range summaries {
-		options = append(options, s.ToString())
+	for i, s := range t.Summaries {
+		options[i] = s.ToString()
 	}
 
 	prompt := promptui.Select{
-		Label: "Mode",
+		Label: "Route Options",
 		Items: options,
 	}
 
 	return prompt.Run()
 }
 
-// DirectionsSubcommand Subcommand for directions
+// DirectionsSubcommand Subcommand to get directions
 var DirectionsSubcommand = cli.Command{
 	Name:  "directions",
 	Usage: "Get directions from Google Maps",
@@ -102,28 +96,25 @@ var DirectionsSubcommand = cli.Command{
 			return err
 		}
 
-		data := directions.GoogleMapsData{
+		trip := directions.Trip{
+			APIKey:      os.Getenv("GOOGLE_API_KEY"),
 			Origin:      origin,
 			Destination: destination,
 			Mode:        mode,
 			Time:        departureTime,
 		}
 
-		directions.Configure(&directions.Settings{
-			APIKey: "AIzaSyCbLP2s621kGDdESEGvVW0bhO1qkSu7WjQ",
-		})
-
-		routes, err := directions.GetRoutes(data)
+		err = trip.Fetch()
 		if err != nil {
 			return err
 		}
 
-		index, summary, err := promptRoutes(mode, routes)
+		index, summary, err := promptRoutes(&trip)
 		if err != nil {
 			return err
 		}
 
-		fmt.Printf("%v: %v", index, summary)
+		fmt.Printf("%v: %v\n", index, summary)
 
 		return nil
 	},

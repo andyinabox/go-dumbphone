@@ -2,7 +2,7 @@ package directions
 
 import (
 	"fmt"
-	// "googlemaps.github.io/maps"
+	"github.com/joho/godotenv"
 	"os"
 	"os/exec"
 	"strconv"
@@ -10,11 +10,19 @@ import (
 	"time"
 )
 
-const APIKey = "AIzaSyCbLP2s621kGDdESEGvVW0bhO1qkSu7WjQ"
+var apiKey string
+
+func init() {
+	err := godotenv.Load("../../.env")
+	if err != nil {
+		panic("Error loading .env file")
+	}
+	apiKey = os.Getenv("GOOGLE_API_KEY")
+}
 
 func defaultTrip() Trip {
 	trip := Trip{
-		APIKey:      APIKey,
+		APIKey:      apiKey,
 		Origin:      "300 Nicollet Mall, Minneapolis, MN",
 		Destination: "90 W 4th St, St Paul, MN",
 		Mode:        "driving",
@@ -71,7 +79,7 @@ func TestConfig(t *testing.T) {
 		t.Log(err)
 	}
 
-	trip.APIKey = APIKey
+	trip.APIKey = apiKey
 	trip.Origin = ""
 	err = trip.Fetch()
 	if err == nil {
