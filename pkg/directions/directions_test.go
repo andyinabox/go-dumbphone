@@ -1,64 +1,59 @@
 package directions
 
 import (
-	"fmt"
-	"googlemaps.github.io/maps"
-	"os"
-	"os/exec"
-	"strconv"
+	// "fmt"
+	// "googlemaps.github.io/maps"
+	// "os"
+	// "os/exec"
+	// "strconv"
 	"testing"
-	"time"
+	// "time"
 )
 
-var testConfig Settings
+const APIKey = "AIzaSyCbLP2s621kGDdESEGvVW0bhO1qkSu7WjQ"
 
-func init() {
-	testConfig = Settings{
-		"AIzaSyCbLP2s621kGDdESEGvVW0bhO1qkSu7WjQ",
-	}
-}
-
-func defaultMapData() GoogleMapsData {
-	data := GoogleMapsData{
+func defaultTrip() Trip {
+	trip := Trip{
+		APIKey:      APIKey,
 		Origin:      "300 Nicollet Mall, Minneapolis, MN",
 		Destination: "90 W 4th St, St Paul, MN",
 		Mode:        "driving",
 		Time:        "now",
 	}
-	return data
+	return trip
 }
 
-func previewB64(t *testing.T, b64 string) error {
-	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
-	html := fmt.Sprintf("<img src=\"data:image/png;base64,%s\">", b64)
+// func previewB64(t *testing.T, b64 string) error {
+// 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+// 	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
+// 	html := fmt.Sprintf("<img src=\"data:image/png;base64,%s\">", b64)
 
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
+// 	f, err := os.Create(filename)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	defer f.Close()
+// 	defer f.Close()
 
-	_, err = f.WriteString(html)
-	if err != nil {
-		return err
-	}
+// 	_, err = f.WriteString(html)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	t.Logf("Created temp file: %s\n", filename)
+// 	t.Logf("Created temp file: %s\n", filename)
 
-	cmd := exec.Command(
-		"open",
-		fmt.Sprintf("file://%s", filename),
-	)
+// 	cmd := exec.Command(
+// 		"open",
+// 		fmt.Sprintf("file://%s", filename),
+// 	)
 
-	err = cmd.Run()
-	if err != nil {
-		return err
-	}
+// 	err = cmd.Run()
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // func openBrowser(url string) {
 // 	exec.Command("open", url).Start()
@@ -66,64 +61,76 @@ func previewB64(t *testing.T, b64 string) error {
 
 func TestConfig(t *testing.T) {
 
-	_, err := GetRoutes(defaultMapData())
+	trip := defaultTrip()
+	trip.APIKey = ""
 
+	err := trip.Fetch()
 	if err == nil {
-		t.Errorf("Expected config error, got none")
+		t.Errorf("Expected requirements error, got none")
 	} else {
-		t.Logf("Expected Error: %s", err)
+		t.Log(err)
 	}
 
-	c := Settings{}
-
-	err = Configure(&c)
-
+	trip.APIKey = APIKey
+	trip.Origin = ""
+	err = trip.Fetch()
 	if err == nil {
-		t.Errorf("Should have recieved no API Key error")
+		t.Errorf("Expected requirements error, got none")
 	} else {
-		t.Logf("Expected Error: %s", err)
+		t.Log(err)
 	}
 
-	err = Configure(&testConfig)
+	trip.Origin = "300 Nicollet Mall, Minneapolis, MN"
+	trip.Destination = ""
+	err = trip.Fetch()
+	if err == nil {
+		t.Errorf("Expected requirements error, got none")
+	} else {
+		t.Log(err)
+	}
 
-	if err != nil {
-		t.Errorf("Configuration error: %s", err)
+	trip.Destination = "90 W 4th St, St Paul, MN"
+	trip.Mode = ""
+	err = trip.Fetch()
+	if err == nil {
+		t.Errorf("Expected requirements error, got none")
+	} else {
+		t.Log(err)
 	}
 
 }
 
-func TestRoutes(t *testing.T) {
+func TestFetch(t *testing.T) {
 
-	routes, err := GetRoutes(defaultMapData())
+	trip := defaultTrip()
+	err := trip.Fetch()
 
 	if err != nil {
-		t.Errorf("Routes error: %s", err)
+		t.Errorf("Fetch Error: %v", err)
 	}
 
-	if len(routes) < 1 {
-		t.Errorf("Expected 1 or more routes, found %d", len(routes))
+	if len(trip.Routes) < 1 {
+		t.Errorf("Expected 1 or more routes, found %d", len(trip.Routes))
 	} else {
-		t.Logf("Found %d routes", len(routes))
+		t.Logf("Found %d routes", len(trip.Routes))
 	}
 
 }
 
 func TestRouteSummaries(t *testing.T) {
 
-	data := defaultMapData()
-	routes, err := GetRoutes(data)
+	trip := defaultTrip()
+	err := trip.Fetch()
 
 	if err != nil {
-		t.Errorf("Routes error: %s", err)
+		t.Errorf("Fetch Error: %v", err)
 	}
 
-	summaries, err := GetRouteSummaries(maps.Mode(data.Mode), routes)
-
-	if len(summaries) < 1 {
+	if len(trip.Summaries) < 1 {
 		t.Errorf("No summaries found")
 	} else {
-		t.Logf("Found %d summaries", len(summaries))
-		for _, s := range summaries {
+		t.Logf("Found %d summaries", len(trip.Summaries))
+		for _, s := range trip.Summaries {
 			t.Logf(s.ToString())
 		}
 	}
@@ -132,50 +139,47 @@ func TestRouteSummaries(t *testing.T) {
 
 func TestTransitRouteSummaries(t *testing.T) {
 
-	data := defaultMapData()
-	data.Mode = "transit"
-
-	routes, err := GetRoutes(data)
+	trip := defaultTrip()
+	trip.Mode = "transit"
+	err := trip.Fetch()
 
 	if err != nil {
-		t.Errorf("Routes error: %s", err)
+		t.Errorf("Fetch Error: %v", err)
 	}
 
-	summaries, err := GetRouteSummaries(maps.Mode(data.Mode), routes)
-
-	if len(summaries) < 1 {
+	if len(trip.Summaries) < 1 {
 		t.Errorf("No summaries found")
 	} else {
-		t.Logf("Found %d summaries", len(summaries))
-		for _, s := range summaries {
+		t.Logf("Found %d summaries", len(trip.Summaries))
+		for _, s := range trip.Summaries {
 			t.Logf(s.ToString())
 		}
 	}
 }
 
-func TestBase64(t *testing.T) {
+// func TestBase64(t *testing.T) {
 
-	routes, err := GetRoutes(defaultMapData())
+// 	routes, err := GetRoutes(defaultMapData())
 
-	if err != nil {
-		t.Errorf("Routes error: %s", err)
-	}
+// 	if err != nil {
+// 		t.Errorf("Routes error: %s", err)
+// 	}
 
-	b64, err := MapImageBase64(routes[0].OverviewPolyline)
+// 	b64, err := MapImageBase64(routes[0].OverviewPolyline)
 
-	if err != nil {
-		t.Errorf("Error encoding image: %s", err)
-	} else {
-		if testing.Verbose() {
-			err = previewB64(t, b64)
-			if err != nil {
-				t.Logf("Error opening preview: %v\n", err)
-			}
-		}
-	}
+// 	if err != nil {
+// 		t.Errorf("Error encoding image: %s", err)
+// 	} else {
+// 		if testing.Verbose() {
+// 			err = previewB64(t, b64)
+// 			if err != nil {
+// 				t.Logf("Error opening preview: %v\n", err)
+// 			}
+// 		}
+// 	}
 
-}
+// }
 
-func TestRender(t *testing.T) {
+// func TestRender(t *testing.T) {
 
-}
+// }
