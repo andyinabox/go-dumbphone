@@ -31,9 +31,15 @@ type GoogleMapsData struct {
 	Time        string
 }
 
+func init() {
+	if DirectionsConfig.APIKey == "" {
+		panic("Google Maps API Key isn't set")
+	}
+}
+
 // GetRoutes get directions for a set of directions data
-func GetRoutes(apiKey string, data GoogleMapsData) []maps.Route {
-	c, err := maps.NewClient(maps.WithAPIKey(apiKey))
+func GetRoutes(data GoogleMapsData) []maps.Route {
+	c, err := maps.NewClient(maps.WithAPIKey(DirectionsConfig.APIKey))
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
@@ -116,8 +122,8 @@ func RenderRoute(route maps.Route, f *os.File) (*os.File, error) {
 }
 
 // MapImageBase64 take a map polyline and encode as Base64 image
-func MapImageBase64(apiKey string, polyline maps.Polyline) (string, error) {
-	imageURL := fmt.Sprintf(imgURLStr, imgW, imgH, polyline.Points, apiKey)
+func MapImageBase64(polyline maps.Polyline) (string, error) {
+	imageURL := fmt.Sprintf(imgURLStr, imgW, imgH, polyline.Points, DirectionsConfig.APIKey)
 
 	// get image url
 	resp, err := http.Get(imageURL)
