@@ -137,6 +137,10 @@ func RenderRoute(route maps.Route, f *os.File) (*os.File, error) {
 
 // MapImageBase64 take a map polyline and encode as Base64 image
 func MapImageBase64(polyline maps.Polyline) (string, error) {
+	if config == nil {
+		return "", errors.New("Module has not been configured")
+	}
+
 	imageURL := fmt.Sprintf(imgURLStr, imgW, imgH, polyline.Points, config.APIKey)
 
 	// get image url
