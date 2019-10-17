@@ -66,7 +66,9 @@ func GetRoutes(data GoogleMapsData) ([]maps.Route, error) {
 		Destination:   data.Destination,
 		Mode:          maps.Mode(data.Mode),
 		DepartureTime: data.Time,
+		Alternatives:  true,
 	}
+
 	routes, _, err := c.Directions(context.Background(), r)
 	if err != nil {
 		return nil, err
@@ -79,6 +81,10 @@ func GetRoutes(data GoogleMapsData) ([]maps.Route, error) {
 type RouteSummary struct {
 	Duration    time.Duration
 	Description string
+}
+
+func (r RouteSummary) toString() string {
+	return fmt.Sprintf("%s (%s)", r.Description, r.Duration)
 }
 
 // GetTransitRouteSummary get a summary of transit options
