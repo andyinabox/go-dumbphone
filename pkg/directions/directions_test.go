@@ -10,14 +10,14 @@ var testConfig Settings
 func init() {
 	testConfig = Settings{
 		"AIzaSyCbLP2s621kGDdESEGvVW0bhO1qkSu7WjQ",
-		"2105 22nd ave s, minneapolis, mn, 55404",
+		"300 Nicollet Mall, Minneapolis, MN",
 	}
 }
 
 func defaultMapData() GoogleMapsData {
 	data := GoogleMapsData{
-		Origin:      "2105 22nd Ave S, Minneapolis, MN",
-		Destination: "1074 Vail Dr, Mendota Heights, MN",
+		Origin:      "300 Nicollet Mall, Minneapolis, MN",
+		Destination: "90 W 4th St, St Paul, MN",
 		Mode:        "driving",
 		Time:        "now",
 	}
