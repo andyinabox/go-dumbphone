@@ -44,6 +44,10 @@ func Configure(c *Settings) error {
 
 	config = c
 
+	if config.APIKey == "" {
+		return errors.New("API Key has not been configured")
+	}
+
 	return nil
 }
 
