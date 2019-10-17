@@ -7,10 +7,9 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
-	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -135,30 +134,31 @@ func GetRouteSummaries(mode maps.Mode, routes []maps.Route) ([]RouteSummary, err
 }
 
 // RenderRoute render a given route
-func RenderRoute(route maps.Route) (*os.File, error) {
+func RenderRoute(wr io.Writer, route maps.Route) error {
 
-	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
+	// timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	// filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
 
-	t, err := template.ParseFiles("directions.html")
+	t, err := template.ParseFiles("./directions.html")
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	f, err := os.Create(filename)
+	// f, err := os.Create(filename)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// defer f.Close()
+
+	prepped, err := prepRouteForTemplate(route)
+
+	err = t.Execute(wr, prepped)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	defer f.Close()
-
-	err = t.Execute(f, route)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return f, nil
+	return nil
 }
 
 // MapImageBase64 take a map polyline and encode as Base64 image
