@@ -10,7 +10,6 @@ var testConfig Settings
 func init() {
 	testConfig = Settings{
 		"AIzaSyCbLP2s621kGDdESEGvVW0bhO1qkSu7WjQ",
-		"300 Nicollet Mall, Minneapolis, MN",
 	}
 }
 
@@ -81,14 +80,14 @@ func TestRouteSummaries(t *testing.T) {
 		t.Errorf("Routes error: %s", err)
 	}
 
-	summaries := GetRouteSummaries(maps.Mode(data.Mode), routes)
+	summaries, err := GetRouteSummaries(maps.Mode(data.Mode), routes)
 
 	if len(summaries) < 1 {
 		t.Errorf("No summaries found")
 	} else {
 		t.Logf("Found %d summaries", len(summaries))
 		for _, s := range summaries {
-			t.Logf(s.toString())
+			t.Logf(s.ToString())
 		}
 	}
 
@@ -105,14 +104,14 @@ func TestTransitRouteSummaries(t *testing.T) {
 		t.Errorf("Routes error: %s", err)
 	}
 
-	summaries := GetRouteSummaries(maps.Mode(data.Mode), routes)
+	summaries, err := GetRouteSummaries(maps.Mode(data.Mode), routes)
 
 	if len(summaries) < 1 {
 		t.Errorf("No summaries found")
 	} else {
 		t.Logf("Found %d summaries", len(summaries))
 		for _, s := range summaries {
-			t.Logf(s.toString())
+			t.Logf(s.ToString())
 		}
 	}
 }

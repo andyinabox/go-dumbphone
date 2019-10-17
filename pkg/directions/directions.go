@@ -33,8 +33,7 @@ type GoogleMapsData struct {
 
 // Settings configuration struct
 type Settings struct {
-	APIKey      string
-	HomeAddress string
+	APIKey string
 }
 
 var config *Settings
@@ -83,12 +82,12 @@ type RouteSummary struct {
 	Description string
 }
 
-func (r RouteSummary) toString() string {
-	return fmt.Sprintf("%s (%s)", r.Description, r.Duration)
+func (r RouteSummary) ToString() string {
+	return fmt.Sprintf("%s (%v)", r.Description, r.Duration)
 }
 
 // GetTransitRouteSummary get a summary of transit options
-func GetTransitRouteSummary(route maps.Route) RouteSummary {
+func GetTransitRouteSummary(route maps.Route) (RouteSummary, error) {
 
 	duration := route.Legs[0].Duration
 	lines := make([]string, 0)
@@ -109,22 +108,24 @@ func GetTransitRouteSummary(route maps.Route) RouteSummary {
 
 	summary := RouteSummary{duration, strings.Join(lines, " > ")}
 
-	return summary
+	return summary, nil
 }
 
 // GetRouteSummaries get summaries of each route
-func GetRouteSummaries(mode maps.Mode, routes []maps.Route) []RouteSummary {
+func GetRouteSummaries(mode maps.Mode, routes []maps.Route) ([]RouteSummary, error) {
 	summaries := make([]RouteSummary, 0)
 
 	for _, route := range routes {
 		if mode == maps.TravelModeTransit {
-			summaries = append(summaries, GetTransitRouteSummary(route))
+			s, _ := GetTransitRouteSummary(route)
+			summaries = append(summaries, s)
 		} else {
-			summaries = append(summaries, RouteSummary{route.Legs[0].Duration, route.Summary})
+			s := RouteSummary{route.Legs[0].Duration, route.Summary}
+			summaries = append(summaries, s)
 		}
 	}
 
-	return summaries
+	return summaries, nil
 }
 
 // RenderRoute render a given route
