@@ -5,9 +5,9 @@ package directions
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -31,17 +31,31 @@ type GoogleMapsData struct {
 	Time        string
 }
 
-func init() {
-	if DirectionsConfig.APIKey == "" {
-		panic("Google Maps API Key isn't set")
-	}
+// Settings configuration struct
+type Settings struct {
+	APIKey      string
+	HomeAddress string
+}
+
+var config *Settings
+
+// Configure configure the module
+func Configure(c *Settings) error {
+
+	config = c
+
+	return nil
 }
 
 // GetRoutes get directions for a set of directions data
-func GetRoutes(data GoogleMapsData) []maps.Route {
-	c, err := maps.NewClient(maps.WithAPIKey(DirectionsConfig.APIKey))
+func GetRoutes(data GoogleMapsData) ([]maps.Route, error) {
+	if config == nil {
+		return nil, errors.New("Module has not been configured")
+	}
+
+	c, err := maps.NewClient(maps.WithAPIKey(config.APIKey))
 	if err != nil {
-		log.Fatalf("fatal error: %s", err)
+		return nil, err
 	}
 	r := &maps.DirectionsRequest{
 		Origin:        data.Origin,
@@ -51,10 +65,10 @@ func GetRoutes(data GoogleMapsData) []maps.Route {
 	}
 	routes, _, err := c.Directions(context.Background(), r)
 	if err != nil {
-		log.Fatalf("fatal error: %s", err)
+		return nil, err
 	}
 
-	return routes
+	return routes, nil
 }
 
 // RouteSummary summary of a google route
@@ -123,7 +137,7 @@ func RenderRoute(route maps.Route, f *os.File) (*os.File, error) {
 
 // MapImageBase64 take a map polyline and encode as Base64 image
 func MapImageBase64(polyline maps.Polyline) (string, error) {
-	imageURL := fmt.Sprintf(imgURLStr, imgW, imgH, polyline.Points, DirectionsConfig.APIKey)
+	imageURL := fmt.Sprintf(imgURLStr, imgW, imgH, polyline.Points, config.APIKey)
 
 	// get image url
 	resp, err := http.Get(imageURL)
