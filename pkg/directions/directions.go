@@ -18,9 +18,9 @@ import (
 )
 
 const (
-	imgURLStr            = "https://maps.googleapis.com/maps/api/staticmap?size=%dx%d&path=enc:%s&key=%s"
-	imgW, imgH           = 230, 230
-	templateFile         = "./directions.html"
+	imgURLStr  = "https://maps.googleapis.com/maps/api/staticmap?size=%dx%d&path=enc:%s&key=%s"
+	imgW, imgH = 230, 230
+	// templateFile         = "./directions.html"
 	transitLineDelimiter = " > "
 )
 
@@ -94,7 +94,7 @@ func (t *Trip) Fetch() error {
 
 // Render generates an HTML file for the Trip and
 // renders to the given `io.Writer`
-func (t *Trip) Render(wr io.Writer, i int) error {
+func (t *Trip) Render(wr io.Writer, i int, templateFile string) error {
 
 	// make sure routes have been fetched
 	err := t.checkForRoutes()
