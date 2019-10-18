@@ -112,8 +112,25 @@ func (t *Trip) Render(wr io.Writer, i int) error {
 		return err
 	}
 
-	// compile template
-	tpl, err := template.ParseFiles(templateFile)
+	polylineToB64 := func(polyline maps.Polyline) string {
+		str, err := t.PolyLineToB64(polyline)
+		if err != nil {
+			panic("Failed to convert polylin to Base64 image in template")
+		}
+		return str
+	}
+
+	humanTime := func(tt time.Time) string {
+		return tt.Format(time.Kitchen)
+	}
+
+	funcMap := template.FuncMap{
+		"polylineToB64": polylineToB64,
+		"humanTime":     humanTime,
+	}
+
+	// parse template file
+	tpl, err := template.New("directions.html").Funcs(funcMap).ParseFiles(templateFile)
 	if err != nil {
 		return err
 	}

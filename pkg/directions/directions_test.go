@@ -199,6 +199,7 @@ func TestRender(t *testing.T) {
 	}
 
 	trip := defaultTrip()
+	trip.Mode = "transit"
 	err = trip.Fetch()
 
 	if err != nil {
