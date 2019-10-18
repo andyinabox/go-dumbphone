@@ -1,5 +1,7 @@
 # Dumbphone
 
+![Screenshot](screenshot.png)
+
 This is a command-line tool for making my Alcatel A392CC flip phone just a little bit smarter. It builds on a few other projects in various states of completion:
 
  - https://github.com/andyinabox/dumbp-a392cc-cli
