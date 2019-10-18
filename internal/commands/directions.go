@@ -21,7 +21,7 @@ func promptOrigin() (string, error) {
 		Validate: func(input string) error {
 			return nil
 		},
-		Default: "300 Nicollet Mall, Minneapolis, MN",
+		Default: os.Getenv("DUMBP_HOME_ADDRESS"),
 	}
 
 	return prompt.Run()
@@ -33,7 +33,7 @@ func promptDestination() (string, error) {
 		Validate: func(input string) error {
 			return nil
 		},
-		Default: "90 W 4th St, St Paul, MN",
+		Default: "",
 	}
 
 	return prompt.Run()
@@ -178,7 +178,7 @@ var DirectionsSubcommand = cli.Command{
 			return err
 		}
 
-		filename = fmt.Sprintf("%s_%s.html", filename, trip.Mode)
+		filename = fmt.Sprintf("%s-%s.html", filename, trip.Mode)
 		file, err := utils.CreateTempFile(filename)
 		if err != nil {
 			return err
