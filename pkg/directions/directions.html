@@ -58,7 +58,7 @@
       <tr>
         <th>Timing</th>
         <td>{{ .Duration }}
-          {{if .DepartureTime }}
+          {{if eq transitMode "transit" }}
             ({{ .DepartureTime | humanTime }} - {{.ArrivalTime | humanTime}})
           {{end}}
         </td>
@@ -75,6 +75,8 @@
     {{end}}
   </ol>
   
+  {{if detailedDirections}}
+
   <hr>
 
   <h2>Detailed Directions</h2>
@@ -107,7 +109,7 @@
     {{end}}
   </ul>
 
-
+  {{end}}
 
   {{end}}
 

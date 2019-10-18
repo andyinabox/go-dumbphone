@@ -38,11 +38,12 @@ func (r RouteSummary) ToString() string {
 // Trip creates an instance of a directions request. After creating a new Trip,
 // be sure to use the `Fetch` method to retrieve possible routes
 type Trip struct {
-	APIKey      string
-	Origin      string
-	Destination string
-	Time        string
-	Mode        string
+	APIKey             string
+	Origin             string
+	Destination        string
+	Time               string
+	Mode               string
+	DetailedDirections bool
 
 	Routes    []maps.Route
 	Summaries []RouteSummary
@@ -125,8 +126,10 @@ func (t *Trip) Render(wr io.Writer, i int) error {
 	}
 
 	funcMap := template.FuncMap{
-		"polylineToB64": polylineToB64,
-		"humanTime":     humanTime,
+		"polylineToB64":      polylineToB64,
+		"humanTime":          humanTime,
+		"detailedDirections": func() bool { return t.DetailedDirections },
+		"transitMode":        func() string { return t.Mode },
 	}
 
 	// parse template file

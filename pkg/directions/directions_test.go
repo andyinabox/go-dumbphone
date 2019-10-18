@@ -22,11 +22,12 @@ func init() {
 
 func defaultTrip() Trip {
 	trip := Trip{
-		APIKey:      apiKey,
-		Origin:      "300 Nicollet Mall, Minneapolis, MN",
-		Destination: "90 W 4th St, St Paul, MN",
-		Mode:        "driving",
-		Time:        "now",
+		APIKey:             apiKey,
+		Origin:             "300 Nicollet Mall, Minneapolis, MN",
+		Destination:        "90 W 4th St, St Paul, MN",
+		Mode:               "driving",
+		Time:               "now",
+		DetailedDirections: true,
 	}
 	return trip
 }
@@ -187,7 +188,38 @@ func TestBase64(t *testing.T) {
 	}
 }
 
-func TestRender(t *testing.T) {
+func TestRenderDriving(t *testing.T) {
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
+
+	f, err := os.Create(filename)
+	defer f.Close()
+
+	if err != nil {
+		t.Errorf("File Error: %v", err)
+	}
+
+	trip := defaultTrip()
+	err = trip.Fetch()
+
+	if err != nil {
+		t.Errorf("Fetch Error: %v", err)
+	}
+
+	err = trip.Render(f, 0)
+	if err != nil {
+		t.Errorf("Rendering error: %v", err)
+	}
+
+	if testing.Verbose() {
+		err = openBrowser("file://" + filename)
+		if err != nil {
+			t.Logf("Error opening preview: %v\n", err)
+		}
+	}
+}
+
+func TestRenderTransit(t *testing.T) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
 
@@ -211,6 +243,43 @@ func TestRender(t *testing.T) {
 		t.Errorf("Rendering error: %v", err)
 	}
 
-	err = openBrowser("file://" + filename)
+	if testing.Verbose() {
+		err = openBrowser("file://" + filename)
+		if err != nil {
+			t.Logf("Error opening preview: %v\n", err)
+		}
+	}
+}
 
+func TestRenderBicycling(t *testing.T) {
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
+
+	f, err := os.Create(filename)
+	defer f.Close()
+
+	if err != nil {
+		t.Errorf("File Error: %v", err)
+	}
+
+	trip := defaultTrip()
+	trip.Mode = "bicycling"
+	trip.DetailedDirections = false
+	err = trip.Fetch()
+
+	if err != nil {
+		t.Errorf("Fetch Error: %v", err)
+	}
+
+	err = trip.Render(f, 0)
+	if err != nil {
+		t.Errorf("Rendering error: %v", err)
+	}
+
+	if testing.Verbose() {
+		err = openBrowser("file://" + filename)
+		if err != nil {
+			t.Logf("Error opening preview: %v\n", err)
+		}
+	}
 }
