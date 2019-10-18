@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/andyinabox/go-dumbphone/cmd/dumbp/cmd"
+	"github.com/andyinabox/go-dumbphone/internal/commands"
 	"github.com/urfave/cli"
 	"log"
 	"os"
@@ -12,7 +12,7 @@ func main() {
 
 	app.Commands = []cli.Command{
 		// directions
-		cmd.DirectionsSubcommand,
+		commands.DirectionsSubcommand,
 	}
 
 	err := app.Run(os.Args)
