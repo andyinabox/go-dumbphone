@@ -14,7 +14,7 @@ This is a command-line tool for making my Alcatel A392CC flip phone just a littl
 
  - [x] Basic cli framework (`dumbp` command)
  - [ ] `directions` command that generates HTML directions to be transfered to a phone (already implemented in python in the [dumbp-gmap-directions](https://github.com/andyinabox/dumbp-gmap-directions) repo
- - [ ] bluetooth file transfer
+ - [ ] bluetooth file transfer (already in [dumbp-gmap-directions](https://github.com/andyinabox/dumbp-gmap-directions))
  - [ ] filesystem file transfer (when using phone as external drive)
  - [ ] `podcast` command that will download podcasts to be transfered to phone
  - [ ] `calendar` command that will sync with Google Calendar using `.vcf` files
