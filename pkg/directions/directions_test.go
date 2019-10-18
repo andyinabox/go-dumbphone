@@ -206,7 +206,7 @@ func TestRenderDriving(t *testing.T) {
 		t.Errorf("Fetch Error: %v", err)
 	}
 
-	err = trip.Render(f, 0)
+	err = trip.Render(f, 0, "./directions.html")
 	if err != nil {
 		t.Errorf("Rendering error: %v", err)
 	}
@@ -238,7 +238,7 @@ func TestRenderTransit(t *testing.T) {
 		t.Errorf("Fetch Error: %v", err)
 	}
 
-	err = trip.Render(f, 0)
+	err = trip.Render(f, 0, "./directions.html")
 	if err != nil {
 		t.Errorf("Rendering error: %v", err)
 	}
@@ -271,7 +271,7 @@ func TestRenderBicycling(t *testing.T) {
 		t.Errorf("Fetch Error: %v", err)
 	}
 
-	err = trip.Render(f, 0)
+	err = trip.Render(f, 0, "./directions.html")
 	if err != nil {
 		t.Errorf("Rendering error: %v", err)
 	}
