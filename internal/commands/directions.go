@@ -14,8 +14,9 @@ import (
 
 // DirectionsSubcommand Subcommand to get directions
 var DirectionsSubcommand = cli.Command{
-	Name:  "directions",
-	Usage: "Get directions from Google Maps",
+	Name:    "directions",
+	Usage:   "Get directions from Google Maps",
+	Aliases: []string{"d"},
 	Action: func(c *cli.Context) error {
 
 		const (

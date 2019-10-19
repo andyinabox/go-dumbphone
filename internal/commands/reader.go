@@ -11,8 +11,9 @@ import (
 
 // ReaderSubcommand Subcommand to get reading material
 var ReaderSubcommand = cli.Command{
-	Name:  "reader",
-	Usage: "Convert web page to readable text",
+	Name:    "reader",
+	Usage:   "Convert web page to readable text",
+	Aliases: []string{"r"},
 	Action: func(c *cli.Context) error {
 
 		const (
