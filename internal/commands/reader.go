@@ -9,46 +9,48 @@ import (
 	"github.com/urfave/cli"
 )
 
-// const (
-// 	templateFile = "./pkg/reader/reader.html"
-// )
-
-func promptURLReader() (string, error) {
-	prompt := promptui.Prompt{
-		Label: "URL",
-		Validate: func(input string) error {
-			_, err := url.Parse(input)
-			if err != nil {
-				return err
-			}
-
-			return nil
-		},
-	}
-
-	return prompt.Run()
-}
-
-func promptTransferReader() (int, string, error) {
-	prompt := promptui.Select{
-		Label: "How would you like to deliver the directions?",
-		Items: []string{
-			"Bluetooth",
-			"USB",
-			"Open in Browser",
-		},
-	}
-
-	return prompt.Run()
-}
-
 // ReaderSubcommand Subcommand to get reading material
 var ReaderSubcommand = cli.Command{
 	Name:  "reader",
 	Usage: "Convert web page to readable text",
 	Action: func(c *cli.Context) error {
 
-		url, err := promptURLReader()
+		const (
+			templateFile = "./pkg/reader/reader.html"
+		)
+
+		var (
+			promptURL = func() (string, error) {
+				prompt := promptui.Prompt{
+					Label: "URL",
+					Validate: func(input string) error {
+						_, err := url.Parse(input)
+						if err != nil {
+							return err
+						}
+
+						return nil
+					},
+				}
+
+				return prompt.Run()
+			}
+
+			promptTransfer = func() (int, string, error) {
+				prompt := promptui.Select{
+					Label: "How would you like to deliver the directions?",
+					Items: []string{
+						"Bluetooth",
+						"USB",
+						"Open in Browser",
+					},
+				}
+
+				return prompt.Run()
+			}
+		)
+
+		url, err := promptURL()
 		if err != nil {
 			return err
 		}
@@ -64,12 +66,12 @@ var ReaderSubcommand = cli.Command{
 		}
 		defer file.Close()
 
-		err = article.Render(file, "./pkg/reader/reader.html")
+		err = article.Render(file, templateFile)
 		if err != nil {
 			return err
 		}
 
-		index, _, err := promptTransferReader()
+		index, _, err := promptTransfer()
 		if err != nil {
 			return err
 		}
