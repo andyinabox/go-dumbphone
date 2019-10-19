@@ -14,7 +14,7 @@ func CreateTempFile(name string) (*os.File, error) {
 
 	// if empty use timestamp
 	if name == "" {
-		name = strconv.FormatInt(time.Now().Unix(), 10)
+		name = Timestamp()
 	}
 
 	filename := fmt.Sprintf("%s%s.html", os.TempDir(), name)
@@ -24,6 +24,10 @@ func CreateTempFile(name string) (*os.File, error) {
 	}
 
 	return f, nil
+}
+
+func Timestamp() string {
+	return strconv.FormatInt(time.Now().Unix(), 10)
 }
 
 // OpenBrowser opens passed url in web browser
