@@ -1,92 +1,119 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Directions</title>
-    <style>
-       img { display: block; margin: 10px 0; }
-      ol { margin: 0; padding: 0; list-style-position: inside; }
-      ol ol, ol ul {
-        padding-left: 5px;
-      }
-      th { text-align: left; vertical-align: top; }
-      tr { border-bottom: 1px solid #ddd; }
-      table { margin-bottom: 10px; }
-    </style>
-  </head>
-  <body>
 
-    {{! there shouldn't really ever be more than one leg }}
-    {{#legs}}
+<head>
+  <title>Directions</title>
+  <style>
+    img {
+      display: block;
+      margin: 10px 0;
+    }
 
-    <img src="data:image/png;base64,{{ overview_polyline.base64 }}">
+    ol {
+      margin: 0;
+      padding: 0;
+      list-style-position: inside;
+    }
+
+    ol ol,
+    ol ul {
+      padding-left: 5px;
+    }
+
+    th {
+      text-align: left;
+      vertical-align: top;
+    }
+
+    tr {
+      border-bottom: 1px solid #ddd;
+    }
+
+    table {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <img src="data:image/png;base64,{{ .OverviewPolyline | polylineToB64 }}" >
+
+  {{range .Legs}}
+
+  <table>
+    <tbody>
+      <tr>
+        <th>From</th>
+        <td>{{ .StartAddress }}</td>
+      </tr>
+      <tr>
+        <th>To</th>
+        <td>{{ .EndAddress }}</td>
+      </tr>
+      <tr>
+        <th>Distance</th>
+        <td>{{ .Distance.HumanReadable }}</td>
+      </tr>
+      <tr>
+        <th>Timing</th>
+        <td>{{ .Duration }}
+          {{if eq transitMode "transit" }}
+            ({{ .DepartureTime | humanTime }} - {{.ArrivalTime | humanTime}})
+          {{end}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
 
-    <table>
-      <tbody>
-        <tr>
-          <th>From</th>
-          <td><b>{{ origin_name }}</b> ({{ start_address }})</td>
-        </tr>
-        <tr>
-          <th>To</th>
-          <td><b>{{ destination_name }}</b> ({{ end_address }})</td>
-        </tr>
-        <tr>
-          <th>Travel Mode</th>
-          <td>{{ travel_mode }} ({{ distance.text}})</td>
-        </tr>
-        <tr>
-          <th>Timing</th>
-          <td>{{ duration.text }} ({{ departure_time.text }} to {{ arrival_time.text }} )</td>
-        </tr>
-      </tbody>
-    </table>
+  <h2>Summary</h2>
 
-    <h2>Summary</h2>
+  <ol>
+    {{range .Steps}}
+    <li>{{ .HTMLInstructions }}</li>
+    {{end}}
+  </ol>
+  
+  {{if detailedDirections}}
 
-    <ol>
-    {{#steps}}
-      <li>{{{ html_instructions }}}</li>
-    {{/steps}}
-    </ol>
+  <hr>
 
-    <hr>
+  <h2>Detailed Directions</h2>
 
-    {{#include_details}}
+  <ul>
+    {{range .Steps}}
+    <br>
+    <img src="data:image/png;base64,{{ .Polyline | polylineToB64 }}">
+    <br>
+    <li>
+      {{with .TransitDetails }}
+      <b style="color: {{ .Line.TextColor }}; background: {{ .Line.Color }}">{{ .Line.ShortName }}</b>
+      {{end}}
 
-    <h2>Detailed Directions</h2>
+      {{ .HTMLInstructions }}
 
-    <ol>
-    {{#steps}}
-      <br>
-      <img src="data:image/png;base64,{{ polyline.base64 }}">
-      <br>
-      <li>
-        {{#transit_details}}
-          <b style="color: {{line.text_color}}; background: {{ line.color }}">{{ line.short_name }}</b>
-        {{/transit_details}}
+      {{with .TransitDetails }}
+      <ul>
+        <li><b>{{ .DepartureStop.Name }}</b> ({{ .DepartureTime | humanTime }})</li>
+        <li>{{ .NumStops }} stops</li>
+        <li><b>{{ .ArrivalStop.Name }}</b> ({{ .ArrivalTime | humanTime }})</li>
+      </ul>
+      {{ end }}
+      <ol>
+        {{range .Steps}}
+        <li>{{ .HTMLInstructions }}</li>
+        {{end}}
+      </ol>
+    </li>
+    {{end}}
+  </ul>
 
-        {{{ html_instructions }}}
+  {{end}}
 
-        {{#transit_details}}
-        <ul>
-          <li><b>{{ departure_stop.name }}</b> ({{ departure_time.text }})</li>
-          <li>{{ num_stops }} stops</li>
-          <li><b>{{ arrival_stop.name }}</b> ({{ arrival_time.text }})</li>
-        </ul>
-        {{/transit_details}}
-        <ol>
-          {{#sub_steps}}
-            <li>{{{ html_instructions }}}</li>
-          {{/sub_steps}}
-        </ol>
-      </li>
-    {{/steps}}
-    </ol>
+  {{end}}
 
-    {{/include_details}}
 
-  {{/legs}}
+</body>
 
-  </body>
 </html>

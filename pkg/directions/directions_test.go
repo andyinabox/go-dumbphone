@@ -2,7 +2,7 @@ package directions
 
 import (
 	"fmt"
-	"googlemaps.github.io/maps"
+	"github.com/joho/godotenv"
 	"os"
 	"os/exec"
 	"strconv"
@@ -10,27 +10,31 @@ import (
 	"time"
 )
 
-var testConfig Settings
+var apiKey string
 
 func init() {
-	testConfig = Settings{
-		"AIzaSyCbLP2s621kGDdESEGvVW0bhO1qkSu7WjQ",
+	err := godotenv.Load("../../.env")
+	if err != nil {
+		panic("Error loading .env file")
 	}
+	apiKey = os.Getenv("GOOGLE_API_KEY")
 }
 
-func defaultMapData() GoogleMapsData {
-	data := GoogleMapsData{
-		Origin:      "300 Nicollet Mall, Minneapolis, MN",
-		Destination: "90 W 4th St, St Paul, MN",
-		Mode:        "driving",
-		Time:        "now",
+func defaultTrip() Trip {
+	trip := Trip{
+		APIKey:             apiKey,
+		Origin:             "300 Nicollet Mall, Minneapolis, MN",
+		Destination:        "90 W 4th St, St Paul, MN",
+		Mode:               "driving",
+		Time:               "now",
+		DetailedDirections: true,
 	}
-	return data
+	return trip
 }
 
 func previewB64(t *testing.T, b64 string) error {
-	name := strconv.FormatInt(time.Now().Unix(), 10)
-	filename := fmt.Sprintf("%s%s.html", os.TempDir(), name)
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
 	html := fmt.Sprintf("<img src=\"data:image/png;base64,%s\">", b64)
 
 	f, err := os.Create(filename)
@@ -47,17 +51,15 @@ func previewB64(t *testing.T, b64 string) error {
 
 	t.Logf("Created temp file: %s\n", filename)
 
-	cmd := exec.Command(
-		"open",
-		fmt.Sprintf("file://%s", filename),
-	)
+	err = openBrowser("file://" + filename)
 
-	err = cmd.Start()
-	if err != nil {
-		return err
-	}
+	return nil
+}
 
-	err = cmd.Wait()
+func openBrowser(url string) error {
+	cmd := exec.Command("open", url)
+
+	err := cmd.Run()
 	if err != nil {
 		return err
 	}
@@ -65,70 +67,78 @@ func previewB64(t *testing.T, b64 string) error {
 	return nil
 }
 
-// func openBrowser(url string) {
-// 	exec.Command("open", url).Start()
-// }
-
 func TestConfig(t *testing.T) {
 
-	_, err := GetRoutes(defaultMapData())
+	trip := defaultTrip()
+	trip.APIKey = ""
 
+	err := trip.Fetch()
 	if err == nil {
-		t.Errorf("Expected config error, got none")
+		t.Errorf("Expected requirements error, got none")
 	} else {
-		t.Logf("Expected Error: %s", err)
+		t.Log(err)
 	}
 
-	c := Settings{}
-
-	err = Configure(&c)
-
+	trip.APIKey = apiKey
+	trip.Origin = ""
+	err = trip.Fetch()
 	if err == nil {
-		t.Errorf("Should have recieved no API Key error")
+		t.Errorf("Expected requirements error, got none")
 	} else {
-		t.Logf("Expected Error: %s", err)
+		t.Log(err)
 	}
 
-	err = Configure(&testConfig)
+	trip.Origin = "300 Nicollet Mall, Minneapolis, MN"
+	trip.Destination = ""
+	err = trip.Fetch()
+	if err == nil {
+		t.Errorf("Expected requirements error, got none")
+	} else {
+		t.Log(err)
+	}
 
-	if err != nil {
-		t.Errorf("Configuration error: %s", err)
+	trip.Destination = "90 W 4th St, St Paul, MN"
+	trip.Mode = ""
+	err = trip.Fetch()
+	if err == nil {
+		t.Errorf("Expected requirements error, got none")
+	} else {
+		t.Log(err)
 	}
 
 }
 
-func TestRoutes(t *testing.T) {
+func TestFetch(t *testing.T) {
 
-	routes, err := GetRoutes(defaultMapData())
+	trip := defaultTrip()
+	err := trip.Fetch()
 
 	if err != nil {
-		t.Errorf("Routes error: %s", err)
+		t.Errorf("Fetch Error: %v", err)
 	}
 
-	if len(routes) < 1 {
-		t.Errorf("Expected 1 or more routes, found %d", len(routes))
+	if len(trip.Routes) < 1 {
+		t.Errorf("Expected 1 or more routes, found %d", len(trip.Routes))
 	} else {
-		t.Logf("Found %d routes", len(routes))
+		t.Logf("Found %d routes", len(trip.Routes))
 	}
 
 }
 
 func TestRouteSummaries(t *testing.T) {
 
-	data := defaultMapData()
-	routes, err := GetRoutes(data)
+	trip := defaultTrip()
+	err := trip.Fetch()
 
 	if err != nil {
-		t.Errorf("Routes error: %s", err)
+		t.Errorf("Fetch Error: %v", err)
 	}
 
-	summaries, err := GetRouteSummaries(maps.Mode(data.Mode), routes)
-
-	if len(summaries) < 1 {
+	if len(trip.Summaries) < 1 {
 		t.Errorf("No summaries found")
 	} else {
-		t.Logf("Found %d summaries", len(summaries))
-		for _, s := range summaries {
+		t.Logf("Found %d summaries", len(trip.Summaries))
+		for _, s := range trip.Summaries {
 			t.Logf(s.ToString())
 		}
 	}
@@ -137,22 +147,19 @@ func TestRouteSummaries(t *testing.T) {
 
 func TestTransitRouteSummaries(t *testing.T) {
 
-	data := defaultMapData()
-	data.Mode = "transit"
-
-	routes, err := GetRoutes(data)
+	trip := defaultTrip()
+	trip.Mode = "transit"
+	err := trip.Fetch()
 
 	if err != nil {
-		t.Errorf("Routes error: %s", err)
+		t.Errorf("Fetch Error: %v", err)
 	}
 
-	summaries, err := GetRouteSummaries(maps.Mode(data.Mode), routes)
-
-	if len(summaries) < 1 {
+	if len(trip.Summaries) < 1 {
 		t.Errorf("No summaries found")
 	} else {
-		t.Logf("Found %d summaries", len(summaries))
-		for _, s := range summaries {
+		t.Logf("Found %d summaries", len(trip.Summaries))
+		for _, s := range trip.Summaries {
 			t.Logf(s.ToString())
 		}
 	}
@@ -160,13 +167,14 @@ func TestTransitRouteSummaries(t *testing.T) {
 
 func TestBase64(t *testing.T) {
 
-	routes, err := GetRoutes(defaultMapData())
+	trip := defaultTrip()
+	err := trip.Fetch()
 
 	if err != nil {
-		t.Errorf("Routes error: %s", err)
+		t.Errorf("Fetch Error: %v", err)
 	}
 
-	b64, err := MapImageBase64(routes[0].OverviewPolyline)
+	b64, err := trip.PolyLineToB64(trip.Routes[0].OverviewPolyline)
 
 	if err != nil {
 		t.Errorf("Error encoding image: %s", err)
@@ -178,9 +186,100 @@ func TestBase64(t *testing.T) {
 			}
 		}
 	}
-
 }
 
-func TestRender(t *testing.T) {
+func TestRenderDriving(t *testing.T) {
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
 
+	f, err := os.Create(filename)
+	defer f.Close()
+
+	if err != nil {
+		t.Errorf("File Error: %v", err)
+	}
+
+	trip := defaultTrip()
+	err = trip.Fetch()
+
+	if err != nil {
+		t.Errorf("Fetch Error: %v", err)
+	}
+
+	err = trip.Render(f, 0, "./directions.html")
+	if err != nil {
+		t.Errorf("Rendering error: %v", err)
+	}
+
+	if testing.Verbose() {
+		err = openBrowser("file://" + filename)
+		if err != nil {
+			t.Logf("Error opening preview: %v\n", err)
+		}
+	}
+}
+
+func TestRenderTransit(t *testing.T) {
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
+
+	f, err := os.Create(filename)
+	defer f.Close()
+
+	if err != nil {
+		t.Errorf("File Error: %v", err)
+	}
+
+	trip := defaultTrip()
+	trip.Mode = "transit"
+	err = trip.Fetch()
+
+	if err != nil {
+		t.Errorf("Fetch Error: %v", err)
+	}
+
+	err = trip.Render(f, 0, "./directions.html")
+	if err != nil {
+		t.Errorf("Rendering error: %v", err)
+	}
+
+	if testing.Verbose() {
+		err = openBrowser("file://" + filename)
+		if err != nil {
+			t.Logf("Error opening preview: %v\n", err)
+		}
+	}
+}
+
+func TestRenderBicycling(t *testing.T) {
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
+
+	f, err := os.Create(filename)
+	defer f.Close()
+
+	if err != nil {
+		t.Errorf("File Error: %v", err)
+	}
+
+	trip := defaultTrip()
+	trip.Mode = "bicycling"
+	trip.DetailedDirections = false
+	err = trip.Fetch()
+
+	if err != nil {
+		t.Errorf("Fetch Error: %v", err)
+	}
+
+	err = trip.Render(f, 0, "./directions.html")
+	if err != nil {
+		t.Errorf("Rendering error: %v", err)
+	}
+
+	if testing.Verbose() {
+		err = openBrowser("file://" + filename)
+		if err != nil {
+			t.Logf("Error opening preview: %v\n", err)
+		}
+	}
 }

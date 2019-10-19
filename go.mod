@@ -3,7 +3,9 @@ module github.com/andyinabox/go-dumbphone
 go 1.13
 
 require (
+	github.com/alexsasharegan/dotenv v0.0.0-20171113213728-090a4d1b5d42
 	github.com/google/uuid v1.1.1 // indirect
+	github.com/joho/godotenv v1.3.0
 	github.com/manifoldco/promptui v0.3.2
 	github.com/sakirsensoy/genv v1.0.1
 	github.com/sergi/go-diff v1.0.0 // indirect
