@@ -1,0 +1,177 @@
+# CRISPR Workshop (9-6-2016)
+
+## Naturally occurring system
+
+* Clustered Regularly Interspaced Short Palindromic Repeats
+  * XXXXXATTAXXXXXATTAXXXXXATTA
+* Describes these repeating sequences, but has come to refer to the whole technology
+* Sequences and Cas (CRISPR-associated) proteins are the two elements of an ancient defense system conserved in bacterial and archael genomes.
+
+Found in 40% of known bacteria genomes and 90% of archaea
+
+3 types of systems
+
+Type II is the simplest, only one enzyme required for targeting/cleavage
+
+ * Cas 9
+
+They require production of RNA sequences...
+
+CRISPR is a memory system
+
+A defence against virus
+
+Cas proteins are the actual effectors
+
+Cas is a guided missile, RNA is guidance system
+
+Three stages
+
+ 1. Acquire and incorporate spaces from encountered mobile elements (phage/plasmids)
+ 2. Transcribe and process crRNAs
+ 3. Target and destroy invaders
+ 
+ War between two institutions: Berkely vs. Gen Institute
+  * Different histories from different insitutions
+  
+Ishino was the first to discover 29 base pair spacers
+
+Francisco Mojica discrovered mysterious short repeats in archaea
+ * Discovers 20 different microbes that contained the pattern
+ * Mojica was first to propose that it was an immune system function
+ * Supposedly came up with CRISPR
+ 
+Yogurt people were interested  
+
+2012, Doudna and Charpentier
+ * Showed the targeting system with RNA as "guide"
+
+Took off incredibly fast. Went to editing a human embryo on 3.4 years
+* Scientists called for a moritorium
+
+CRISPR is way easier, more affordable, and capable of complex operations
+
+* Cas9 creates double-break of DNA strand
+* As repair system starts, it's hijacked
+* All that's needed is a 20-character RNA
+* Two repair pathways: NHEJ/HDR
+ * NHEJ -- just jam the two ends together (Gene Disruption)
+ * HDR - Looks for a homologous region and uses that to repair (Gene Edition)
+ 
+ ---
+ 
+ Oliver
+ 
+ 
+ * Mid-1970's-present: restriction endonucleases
+  * Swapping DNA from one gene to another
+  * Innate immune system
+  * CRISPR does a similar action, but acquired
+  * Have to do it in a test tube    
+* Late 80's to present: site-specific recombinase
+ * Enzyme does both cutting and recombination
+ * Can be done in an organism
+ * Limited to one location (or two or three)
+ * Goal is to have something that you can program to cut anywayse
+* mid 90's - present : programmable endonucleases
+ * Zinc Finger Nocleases (mid 90s)
+  * Protein motif that holds zinc ion 
+ * TALENs (2010)
+ * These require protein engineering
+* CRISPR (2013)
+ * Programmable part is RNA, not protein
+ * sgRNA -> guide RNA
+ * Really easy to engineer
+ * Cas9 Protein (hard part) doesn't change
+ * Doing what's been done before, but _way easier_
+ 
+ ## Process
+ 
+ * "scaffold" connects to Cas9
+ * "spacer" is the custom part
+  * 20 nucleotides long
+  * "seed region" important for binding
+ * Needs a site complimentary to the spacer region
+ * PAM site -- critical sequence required for Cas9 to do initial binding (NGG)
+ * Cas9 bounces around, stops at PAM sites and checks for matching sequences
+  * Cut is 3 nucleotides in
+ * Software algorithms help design guide RNA
+ * Really, just breaks the DNA
+ * Two pathways to fixing (see NHEJ  & HDR above)
+  * NHEJ is error prone, good for breaking things but not much else
+  * HDR is good for fixing/adding genes
+   * Need a repair template
+    * need "homology arm" on either side of desired change within template   
+ * CRISPR can do multiple simultanious edits
+ * One challenge is not having it go to the wrong site
+ * Can also have a "dCas9" that acts as shuttle to a particular location on the strand
+ 
+ ## Setting up your operation
+ 
+  1. Develop a biological question
+  2. Select your desired manipulation
+  3. 
+  ....
+  Cloning (all sucks, but in different ways)
+  
+  
+  1. Choose a species
+  2. Select gene region to be targeted
+  3. Select gRNAs based on predicted "on-target" and "off-target" activity
+  4. Sythesize and clone desired gRNAs
+  5. Deliver gRNA and Cas9 and validate genome edit!
+ 
+ web.mit.edu/engleward-lab/animations/
+ 
+ http://yeastgenome.org/
+ http://crispr.dbcls.jp/
+ http://wyrickbioinfo2.smb.wsu.edu/crispr.html
+  * Converts guide arm sequence into longer sequences that are clonable (oligos)
+addgene.org
+
+
+CRISPR "doesn't leave a trace"
+
+
+Allows you to edit before the "germ line" which means that it will be expressed in offspring
+
+Possibly will be used in the eye
+ 
+ CRISPR Patent war!
+ 
+  * Maraffini filed in 2008, but didn't have enough expirimental demonstration
+  * Doudna applied in 2014
+  * Broad Institute filed expedited application and got it first
+  * Doudna filed a dispuse of USPO
+  
+  Gene Drives - ??
+  "A Prudent Path Forward for Genomic Engineering..." — convened in Baltimore, similar to meeting in 1970 with many of the same people present
+
+October 2015 - Church simultaniously edits 62 sites in pig genome
+Nov - Harvard unveiled CRISPR mosquito for malaria
+Dec - At the end of ear US, UK, and Chna meet about engineering human embryos
+
+Beijing Genomics Institute
+
+CRISPR editing im Humans
+
+ * Now it's totally possible to edit genes in humans
+ * Complete ban is impractical given the availabilty of CRISPR
+ * Don't edit the human germ line
+ * In U.S. regulation tends to be based exclusively on funding
+ * Peter Nygard essentially bought the Bahamas to do this research
+ * Crick Institute (UK) granted perm to engineer to do CRISPR on embryos
+ * You can make a genetic mod that gets outside all genetic oversight
+   * If you just knock out a gene, it's indistinguishable from a naturally-ocurring break and there's no foreign DNA  
+* Oxitec Mosquito: male mosquito with lethal gene
+  * This would crash the mosquito population 
+  * Needs to be repopulated
+  * Trying to get permission to release in Florida
+* "Gene Drives" it's possible to completely eradicate a species
+  * You actually carry the crispr gene within the genome
+  * The DNA you put in is the CRISPR system itself
+  * It continues to self-propogate  
+ 
+ 
+ * Human cloning scandal with cult (Raeliens)
+ 
