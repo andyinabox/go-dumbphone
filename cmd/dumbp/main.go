@@ -1,14 +1,15 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/andyinabox/go-dumbphone/internal/commands"
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli"
-	"log"
-	"os"
 )
 
-const version = "0.1.0"
+const version = "0.1.2"
 
 func main() {
 	err := godotenv.Load()
@@ -23,6 +24,7 @@ func main() {
 	app.Commands = []cli.Command{
 		// directions
 		commands.DirectionsSubcommand,
+		commands.ReaderSubcommand,
 	}
 
 	err = app.Run(os.Args)

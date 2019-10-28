@@ -1,39 +1,56 @@
 package reader
 
 import (
-	"github.com/andyinabox/go-dumbphone/internal/utils"
 	"testing"
+
+	"github.com/andyinabox/go-dumbphone/internal/utils"
 )
 
 const (
-	url = "http://magazine.art21.org/2012/01/31/5-questions-for-contemporary-practice-with-claire-pentecost/#.XaomsCV7mL4"
+	url = "https://hyperallergic.com/523358/activists-infiltrate-moma-party/"
 )
 
-func TestReader(t *testing.T) {
-	_, err := GetPage(url)
+func TestNew(t *testing.T) {
+	a, err := New(url)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("%s", err)
+	}
+
+	if a.Title == "" {
+		t.Fatal("Title field is empty")
+	} else {
+		t.Logf("Title: %s", a.Title)
+	}
+
+	if a.Body == "" {
+		t.Fatal("Body field is empty")
+	} else {
+		t.Logf("Body: %s", a.Body)
 	}
 }
 
-func TestReaderToFile(t *testing.T) {
+func TestRender(t *testing.T) {
+	a, err := New(url)
+	if err != nil {
+		t.Fatalf("%s", err)
+	}
+
 	f, err := utils.CreateTempFile("")
 	defer f.Close()
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("%s", err)
 	}
 
-	html, err := GetPage(url)
+	err = a.Render(f, "./reader.html")
 	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = f.WriteString(html)
-	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("%s", err)
 	}
 
 	if testing.Verbose() {
-		utils.BrowserSend(f)
+		err = utils.BrowserSend(f)
+		if err != nil {
+			t.Logf("Error opening in browser: %s", err)
+		}
 	}
+
 }

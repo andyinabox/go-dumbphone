@@ -37,9 +37,11 @@
 
 <body>
 
-  <h1>{{ .Title }}</h1>
+    <h1>{{ .Title }}</h1>
+    <p><i>{{ .URL }}</i></p>
+    
+    <div>{{ .Body | unescape }}</div>
 
-  <div>{{ .Body }}</div>
 
 </body>
 
