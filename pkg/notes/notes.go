@@ -49,11 +49,21 @@ func Parse(b []byte) ([]byte, error) {
 	return output, nil
 }
 
-// Sync all files
-func (c *Collection) Sync() ([]*os.File, error) {
-	// files, err := c.getFiles()
+// Run will parsee all files into temp files, then return
+// the file list
+func (c *Collection) Run() ([]*os.File, error) {
 
-	return nil, nil
+	files, err := c.getFiles()
+	if err != nil {
+		return nil, err
+	}
+
+	parsed, err := c.parseAll(files)
+	if err != nil {
+		return nil, err
+	}
+
+	return parsed, nil
 }
 
 func (c *Collection) getFiles() ([]*os.File, error) {
