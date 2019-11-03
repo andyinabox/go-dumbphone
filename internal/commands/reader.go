@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"net/url"
 
 	"github.com/andyinabox/go-dumbphone/internal/utils"
@@ -85,10 +86,11 @@ var ReaderSubcommand = cli.Command{
 			}
 			break
 		case 1:
-			err := utils.USBSend(file)
-			if err != nil {
-				return err
-			}
+			return errors.New("USB transfer not yet implemented")
+			// err := utils.USBSend(file)
+			// if err != nil {
+			// 	return err
+			// }
 			break
 		case 2:
 			err := utils.BrowserSend(file)

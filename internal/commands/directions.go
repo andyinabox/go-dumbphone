@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -207,10 +208,11 @@ var DirectionsSubcommand = cli.Command{
 			}
 			break
 		case 1:
-			err := utils.USBSend(file)
-			if err != nil {
-				return err
-			}
+			return errors.New("USB transfer not yet implemented")
+			// err := utils.USBSend(file)
+			// if err != nil {
+			// 	return err
+			// }
 			break
 		case 2:
 			err := utils.BrowserSend(file)
