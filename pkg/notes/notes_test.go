@@ -1,11 +1,9 @@
 package notes
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	// "io"
-	"io/ioutil"
+
 	"os"
 	"path/filepath"
 	"testing"
@@ -63,39 +61,32 @@ func TestSortFiles(t *testing.T) {
 
 }
 
-func TestParse(t *testing.T) {
+func TestParseAll(t *testing.T) {
 	assert := assert.New(t)
 	require := require.New(t)
 
-	sampleIn, err := os.Open("../../test/data/markdown/sample.md")
-	require.Nil(err)
-	inBytes, err := ioutil.ReadAll(sampleIn)
+	dirname := "../../test/data/notes/"
+
+	notes, err := Create(dirname, 3)
 	require.Nil(err)
 
-	sampleOut, err := os.Open("../../test/data/markdown/sample.html")
+	files, err := notes.getFiles()
 	require.Nil(err)
-	outBytes, err := ioutil.ReadAll(sampleOut)
-	require.Nil(err)
+	require.NotEqual(len(files), 0)
 
-	parsedBytes, err := Parse(inBytes)
+	parsed, err := notes.parseAll(files)
 	assert.Nil(err)
+	assert.NotEqual(len(parsed), 0, "Parsed files should be greater than 0")
 
-	outputPath := "../../test/data/markdown/output.html"
-	output, _ := os.Create(outputPath)
-	output.Write(parsedBytes)
-	defer output.Close()
-
-	if assert.Equal(string(parsedBytes), string(outBytes)) {
-		output.Close()
-		os.Remove(outputPath)
+	for _, p := range parsed {
+		assert.NotEqual(len(p), 0, "Parsed data should not contain 0 bytes")
 	}
+
 }
 
 func TestRun(t *testing.T) {
 	assert := assert.New(t)
 	require := require.New(t)
-
-	var zero int64 = 0
 
 	inDir := "../../test/data/notes/"
 	outDir := "../../test/data/notes_out/"
@@ -106,47 +97,13 @@ func TestRun(t *testing.T) {
 	notes, err := Create(inDir, 3)
 	assert.Nil(err)
 
-	files, err := notes.Run()
+	md, err := notes.Run()
 	assert.Nil(err)
 
-	assert.NotEqual(len(files), 0, "Should return files")
-	assert.Equal(len(files), notes.Count, "Should return the expected number of files")
-
-	for _, src := range files {
-		stat, err := src.Stat()
-		assert.Nil(err)
-		assert.NotEqual(stat.Size(), zero, "Source file size should not be zero")
-
-		// buf := make([]byte, BUFFERSIZE)
-		inBytes, err := ioutil.ReadAll(src)
-		assert.Nil(err)
-		assert.NotEqual(len(inBytes), 0, "Bytes read should be greater than zero")
-
-		newFile := fmt.Sprintf("%s%s", outDir, stat.Name())
-		t.Log(newFile)
-
-		err = ioutil.WriteFile(newFile, inBytes, 0777)
-		assert.Nil(err)
-
-		// dst, err := os.Create(newFile)
-		// assert.Nil(err)
-		// defer dst.Close()
-
-		// written, err := io.Copy(dst, src)
-		// assert.Nil(err)
-
-		// assert.NotEqual(written, zero, "Bytes written should not be zero")
+	assert.NotEqual(len(md), 0, "Should return files")
+	assert.Equal(len(md), notes.Count, "Should return the expected number of files")
+	//
+	for _, b := range md {
+		assert.NotEqual(len(b), 0, "Bytes read should be greater than zero")
 	}
-
-	for _, f := range files {
-		defer f.Close()
-		s, err := f.Stat()
-		assert.Nil(err)
-
-		outFile := fmt.Sprintf("%s%s", outDir, s.Name())
-		outS, err := os.Stat(outFile)
-		assert.Nil(err, "File copies should exist")
-		assert.NotEqual(outS.Size(), zero, "File size should not be zero")
-	}
-
 }

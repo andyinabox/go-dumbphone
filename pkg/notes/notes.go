@@ -1,16 +1,14 @@
 package notes
 
 import (
-	// "bytes"
 	"errors"
 	"fmt"
-	"github.com/andyinabox/go-dumbphone/internal/utils"
-	// "github.com/microcosm-cc/bluemonday"
-	"gopkg.in/russross/blackfriday.v2"
-	// "io"
 	"io/ioutil"
 	"os"
 	"sort"
+
+	"github.com/andyinabox/go-dumbphone/internal/utils"
+	"github.com/andyinabox/go-dumbphone/pkg/markdown"
 )
 
 // Collection Struct for notes sync
@@ -42,16 +40,9 @@ func Create(dir string, count int) (*Collection, error) {
 	return collection, nil
 }
 
-// Parse write html to io writer from markdown
-func Parse(b []byte) ([]byte, error) {
-	output := blackfriday.Run(b)
-	// html := bluemonday.UGCPolicy().SanitizeBytes(output)
-	return output, nil
-}
-
 // Run will parsee all files into temp files, then return
 // the file list
-func (c *Collection) Run() ([]*os.File, error) {
+func (c *Collection) Run() ([][]byte, error) {
 
 	files, err := c.getFiles()
 	if err != nil {
@@ -107,25 +98,11 @@ func (c *Collection) getFiles() ([]*os.File, error) {
 	return files, nil
 }
 
-// func byDate()
+func (c *Collection) parseAll(files []*os.File) ([][]byte, error) {
 
-// func (c *Collection) verifyRequirements() error {
-// 	if c.SourceDir == "" || c.Count == nil {
-// 		return errors.New("Missing required attributes")
-// 	}
-// }
-
-func (c *Collection) parseAll(files []*os.File) ([]*os.File, error) {
-
-	var parsed []*os.File
+	var parsed [][]byte
 
 	for _, f := range files {
-
-		// get file info
-		s, err := f.Stat()
-		if err != nil {
-			return nil, err
-		}
 
 		// read file into bytes
 		b, err := ioutil.ReadAll(f)
@@ -133,26 +110,26 @@ func (c *Collection) parseAll(files []*os.File) ([]*os.File, error) {
 			return nil, err
 		}
 
-		// create temp file to store output
-		tmp, err := utils.CreateTempFile(s.Name())
-		if err != nil {
-			return nil, err
-		}
+		// // create temp file to store output
+		// tmp, err := utils.CreateTempFile(s.Name())
+		// if err != nil {
+		// 	return nil, err
+		// }
 
 		// parse markdown into html bytes
-		p, err := Parse(b)
+		p, err := markdown.Parse(b)
 		if err != nil {
 			return nil, err
 		}
 
-		// write parsed bytes to temp file
-		_, err = tmp.Write(p)
-		if err != nil {
-			return nil, err
-		}
+		// // write parsed bytes to temp file
+		// _, err = tmp.Write(p)
+		// if err != nil {
+		// 	return nil, err
+		// }
 
 		// add to parsed files slice
-		parsed = append(parsed, tmp)
+		parsed = append(parsed, p)
 	}
 
 	return parsed, nil

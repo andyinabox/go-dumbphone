@@ -25,6 +25,7 @@ func main() {
 		// directions
 		commands.DirectionsSubcommand,
 		commands.ReaderSubcommand,
+		commands.MarkdownSubcommand,
 	}
 
 	err = app.Run(os.Args)
