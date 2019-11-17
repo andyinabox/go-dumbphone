@@ -1,91 +1,89 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
-	"yaml"
 
-	"github.com/spf13/viper"
+	"github.com/andyinabox/go-dumbphone/pkg/directions"
+	"github.com/andyinabox/go-dumbphone/pkg/notes"
+	"github.com/andyinabox/go-dumbphone/pkg/usb"
 )
 
 const (
-	ConfigFileName string = "config"
-	ConfigDirName  string = ".dumbp"
+	// ConfigFileName the name of the config file
+	ConfigFileName string = "config.yaml"
+	// ConfigDirName the name of the dir in home folder
+	ConfigDirName string = ".dumbp"
 )
 
+// Configuration is the App-level configuration struct
 type Configuration struct {
-	USBVolume  `desc: "Settings for managing your phone via USB"`
-	Directions `desc: "Settings for the directions command"`
-	Notes      `desc: "Settings for the notes command"`
+	USB        *usb.Config        `desc: "Settings for managing your phone via USB"`
+	Directions *directions.Config `desc: "Settings for the directions command"`
+	Notes      *notes.Config      `desc: "Settings for the notes command"`
 }
 
-type Volume struct {
-	Root          string `desc:"Path to your phone when plugged into USB"`
-	PodcastsDir   string `desc:"Podcasts folder on your phone"`
-	NotesDir      string `desc:"Notes folder on your phone"`
-	ReaderDir     string `desc:"Reading folder on your phone"`
-	DirectionsDir string `desc:"Directions folder on your phone"`
-}
+var configDir string
+var configFile string
+var config *Configuration
+var configFileObject *os.File
 
-type Directions struct {
-	GoogleAPIKey string `desc:"Google Maps API Key"`
-	HomeAddress  string `desc:"Default starting address for directions`
-}
+func Load() error {
 
-type Notes struct {
-	NotesDir string `desc:"Notes folder on your computer"`
-}
-
-var ConfigDir string = fmt.Sprintf("%s/%s", os.UserHomeDir(), ConfigDirName)
-var defaults = &Configuration{
-	&Volume{
-		"",
-		"/Podcasts",
-		"/Notes",
-		"/Reading",
-		"/Directions",
-	},
-	&Directions{
-		"",
-		"",
-	},
-	&Notes{
-		"",
-	},
-}
-
-func GetConfig() error {
-	v := viper.GetViper()
-
-	v.SetConfigName(ConfigFileName) // name of config file (without extension)
-	v.AddConfigPath(ConfigDir)      // path to look for the config file in
-
-	err := v.ReadInConfig() // Find and read the config file
-
-	if err := viper.ReadInConfig(); err != nil {
-		// config file isn't found, let's create a default config
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			err = Create()
-
-			if err != nil {
-				return err
-			}
-		} else {
-			return err
-		}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
 	}
 
-	// unmarshall
+	configDir = fmt.Sprintf("%s/%s", home, ConfigDirName)
+	configFile = fmt.Sprintf("%s/%s", configDir, ConfigFileName)
+
+	_, err = os.Stat(configFile)
+
+	if os.IsNotExist(err) {
+		config = getDefaultConfig()
+		WriteConfig()
+	} else if err {
+		return err
+	}
+
+	configFileObject = os.Open(configFile)
 
 	return nil
 }
 
-func Create() error {
-	// save config as file
-	v := viper.GetViper()
+func Close() {
+	if configFileObject != nil {
+		configFileObject.Close()
+	}
+}
 
-	c, err := yaml.Marshall(defaults)
-	file := os.Create(fmt.Sprintf("%s/%s"), ConfigDir, configFileName)
+func getDefaultConfig() *Configuration {
+	return &Configuration{
+		usb.ConfigDefaults,
+		directions.ConfigDefaults,
+		notes.ConfigDefaults,
+	}
+}
+
+func GetGroup(key string) interface{} {
+	return nil
+}
+
+func GetValue(key1 string, key2 string) interface{} {
+	return nil
+}
+
+func SetValue(key1 string, key2 string, value interface{}) bool {
+	return nil
+}
+
+func WriteConfig() error {
+
+	if config == nil {
+		return errors.New("Configuration has not yet been loaded")
+	}
 
 	return nil
 }
