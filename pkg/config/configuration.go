@@ -30,6 +30,7 @@ type Configuration struct {
 var configFilePath string
 var config *Configuration
 var configFileObject *os.File
+var currentGroup interface{}
 
 // Load should always be called initially to load
 // config file or create an empty one
@@ -45,13 +46,15 @@ func Load() error {
 	configFilePath = fmt.Sprintf("%s/%s/%s", home, ConfigDirName, ConfigFileName)
 
 	// read or create config
-	err = loadConfig(config)
+	err = getConfig(config)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
+
+
 
 // Save saves the config file to the filesystem
 func Save() error {
@@ -68,7 +71,10 @@ func Save() error {
 	return nil
 }
 
-func loadConfig(c *Configuration) error {
+
+
+
+func getConfig(c *Configuration) error {
 
 	// check to see if the file exists
 	_, err := os.Stat(configFilePath)
