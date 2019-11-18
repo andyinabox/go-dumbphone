@@ -20,20 +20,21 @@ func GetTag(s interface{}, fieldName string, tagName string) (string, error) {
 	return field.Tag.Get(tagName), nil
 }
 
-func GetTagMap(s interface{}, tagName string, reverse bool) (interface{}, error) {
+// func GetFieldValueByName(s interface{}, fieldName string) (interface{}, error) {
+// 	valueOf, err := checkStruct(s)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return valueOf.FieldByName(fieldName).Interface(), nil
+// }
+
+func GetTagMap(s interface{}, tagName string) (map[interface{}]string, error) {
 	valueOf, err := checkStruct(s)
 	if err != nil {
 		return nil, err
 	}
 
-	if reverse {
-		return makeTagMapReverse(valueOf, tagName), nil
-	}
-
-	return makeTagMap(valueOf, tagName), nil
-}
-
-func makeTagMap(valueOf reflect.Value, tagName string) map[interface{}]string {
 	m := make(map[interface{}]string)
 	fieldIndex := []int{0}
 	var tagValue string
@@ -47,10 +48,15 @@ func makeTagMap(valueOf reflect.Value, tagName string) map[interface{}]string {
 		m[fieldValue] = tagValue
 	}
 
-	return m
+	return m, nil
 }
 
-func makeTagMapReverse(valueOf reflect.Value, tagName string) map[string]interface{} {
+func GetTagMapReverse(s interface{}, tagName string) (map[string]interface{}, error) {
+	valueOf, err := checkStruct(s)
+	if err != nil {
+		return nil, err
+	}
+
 	m := make(map[string]interface{})
 	fieldIndex := []int{0}
 	var tagValue string
@@ -64,7 +70,7 @@ func makeTagMapReverse(valueOf reflect.Value, tagName string) map[string]interfa
 		m[tagValue] = fieldValue
 	}
 
-	return m
+	return m, nil
 }
 
 func checkStruct(s interface{}) (reflect.Value, error) {

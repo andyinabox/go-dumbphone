@@ -2,22 +2,17 @@ package config
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 
+	"github.com/jinzhu/copier"
 	"gopkg.in/yaml.v2"
 
+	"github.com/andyinabox/go-dumbphone/internal/utils"
 	"github.com/andyinabox/go-dumbphone/pkg/directions"
 	"github.com/andyinabox/go-dumbphone/pkg/notes"
 	"github.com/andyinabox/go-dumbphone/pkg/usb"
-)
-
-const (
-	// ConfigFileName the name of the config file
-	ConfigFileName string = "config.yaml"
-	// ConfigDirName the name of the dir in home folder
-	ConfigDirName string = ".dumbp"
 )
 
 // Configuration is the App-level configuration struct
@@ -27,34 +22,32 @@ type Configuration struct {
 	Notes      *notes.Config      `key:"notes" desc:"Settings for the notes command"`
 }
 
-var configFilePath string
+// ConfigFilePath path to the config file
+var ConfigFilePath string
+
 var config *Configuration
-var configFileObject *os.File
-var currentGroup interface{}
+
+var groupMap map[string]interface{}
 
 // Load should always be called initially to load
 // config file or create an empty one
-func Load() error {
+func Load(filePath string) error {
 
-	// get the user's home dir
-	home, err := os.UserHomeDir()
+	ConfigFilePath = filePath
+
+	// read or create config
+	config, err := getConfig()
 	if err != nil {
 		return err
 	}
 
-	// set the full config file path
-	configFilePath = fmt.Sprintf("%s/%s/%s", home, ConfigDirName, ConfigFileName)
-
-	// read or create config
-	err = getConfig(config)
+	groupMap, err = utils.GetTagMapReverse(config, "key")
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
-
-
 
 // Save saves the config file to the filesystem
 func Save() error {
@@ -63,7 +56,7 @@ func Save() error {
 		return errors.New("Configuration has not yet been loaded")
 	}
 
-	err := writeConfig(config)
+	err := writeConfig(config, ConfigFilePath)
 	if err != nil {
 		return err
 	}
@@ -71,44 +64,71 @@ func Save() error {
 	return nil
 }
 
+// GetGroup get a config group
+func Get(groupName string) (interface{}, error) {
 
+	if config == nil {
+		return nil, errors.New("Must initialize with Load first")
+	}
 
-
-func getConfig(c *Configuration) error {
-
-	// check to see if the file exists
-	_, err := os.Stat(configFilePath)
+	err := validateGroupName(groupName)
 	if err != nil {
+		return nil, err
+	}
+	return groupMap[groupName], nil
+}
 
-		// if not, create default config and write the file
-		if os.IsNotExist(err) {
-			c = createConfig()
-			err = writeConfig(c)
-			if err != nil {
-				return err
-			}
+func validateGroupName(s string) error {
+	found := false
 
-			// else return any other errors
-		} else {
-			return err
+	for k := range groupMap {
+		if s == k {
+			found = true
 		}
-		// if it exists, read in the config file
-	} else {
-		err = readConfig(c)
-		if err != nil {
-			return err
-		}
+	}
+
+	if !found {
+		return errors.New("Not a valid config group name")
 	}
 
 	return nil
 }
 
-// read config file into memory
-func readConfig(c *Configuration) error {
+func getConfig() (*Configuration, error) {
 	var c *Configuration
 
+	// check to see if the file exists
+	_, err := os.Stat(ConfigFilePath)
+	if err != nil {
+
+		// if not, create default config and write the file
+		if os.IsNotExist(err) {
+			c = createConfig()
+			err = writeConfig(c, ConfigFilePath)
+			if err != nil {
+				return nil, err
+			}
+
+			// else return any other errors
+		} else {
+			return nil, err
+		}
+		// if it exists, read in the config file
+	} else {
+		err = readConfig(c, ConfigFilePath)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return c, nil
+}
+
+// read config file into memory
+func readConfig(c *Configuration, filePath string) error {
+
 	// open file
-	f, err := os.Open(configFilePath)
+	f, err := os.Open(filePath)
 	if err != nil {
 		return err
 	}
@@ -129,12 +149,22 @@ func readConfig(c *Configuration) error {
 	return nil
 }
 
-func writeConfig(c *Configuration) error {
-	f, err := os.Open(configFilePath)
+func writeConfig(c *Configuration, filePath string) error {
+	var f *os.File
+
+	// make sure path exists
+	p := path.Dir(filePath)
+	err := os.MkdirAll(p, 0777)
 	if err != nil {
 		return err
 	}
+
+	f, err = os.Create(filePath)
 	defer f.Close()
+
+	if err != nil {
+		return err
+	}
 
 	b, err := yaml.Marshal(c)
 	if err != nil {
@@ -150,9 +180,14 @@ func writeConfig(c *Configuration) error {
 }
 
 func createConfig() *Configuration {
-	return &Configuration{
-		usb.ConfigDefaults,
-		directions.ConfigDefaults,
-		notes.ConfigDefaults,
-	}
+
+	u := usb.Config{}
+	d := directions.Config{}
+	n := notes.Config{}
+
+	copier.Copy(&u, usb.ConfigDefaults)
+	copier.Copy(&d, directions.ConfigDefaults)
+	copier.Copy(&n, notes.ConfigDefaults)
+
+	return &Configuration{&u, &d, &n}
 }

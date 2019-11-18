@@ -1,0 +1,11 @@
+usb:
+  root: ""
+  podcastsdir: /Podcasts
+  notesdir: /Notes
+  readerdir: /Reading
+  directionsdir: /Directions
+directions:
+  googleapikey: ""
+  homeaddress: ""
+notes:
+  notesdir: ""

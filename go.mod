@@ -7,6 +7,7 @@ require (
 	github.com/alexsasharegan/dotenv v0.0.0-20171113213728-090a4d1b5d42
 	github.com/gomarkdown/markdown v0.0.0-20190912180731-281270bc6d83
 	github.com/google/uuid v1.1.1 // indirect
+	github.com/jinzhu/copier v0.0.0-20190924061706-b57f9002281a
 	github.com/joho/godotenv v1.3.0
 	github.com/manifoldco/promptui v0.3.2
 	github.com/mauidude/go-readability v0.0.0-20141216012317-2f30b1a346f1

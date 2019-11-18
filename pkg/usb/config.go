@@ -13,5 +13,5 @@ var ConfigDefaults = &Config{
 	"/Podcasts",
 	"/Notes",
 	"/Reading",
-	"/Directions"
+	"/Directions",
 }

@@ -49,12 +49,12 @@ func TestGetTagMap(t *testing.T) {
 	assert := assert.New(t)
 
 	{
-		m, err := GetTagMap(test, "label", false)
+		m, err := GetTagMap(test, "label")
 		assert.Nil(err)
 		assert.Equal(m, expectedMap)
 	}
 	{
-		m, err := GetTagMap(test, "key", true)
+		m, err := GetTagMapReverse(test, "key")
 		assert.Nil(err)
 		assert.Equal(m, expectedMapReverse)
 	}

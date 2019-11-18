@@ -1,0 +1,11 @@
+usb:
+  root: /Volumes/DUMBPHONE
+  podcastsdir: /Podcasts
+  notesdir: /Notes
+  readerdir: /Reading
+  directionsdir: /Directions
+directions:
+  googleapikey: "1234567"
+  homeaddress: 12345 Somewhere St. Springfield, IL
+notes:
+  notesdir: ~/Dropbox/Writing/Notes
