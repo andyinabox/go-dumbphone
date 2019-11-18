@@ -3,7 +3,10 @@ package config
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/andyinabox/go-dumbphone/pkg/directions"
 	"github.com/andyinabox/go-dumbphone/pkg/notes"
@@ -19,71 +22,131 @@ const (
 
 // Configuration is the App-level configuration struct
 type Configuration struct {
-	USB        *usb.Config        `desc: "Settings for managing your phone via USB"`
-	Directions *directions.Config `desc: "Settings for the directions command"`
-	Notes      *notes.Config      `desc: "Settings for the notes command"`
+	USB        *usb.Config        `key:"usb" desc:"Settings for managing your phone via USB"`
+	Directions *directions.Config `key:"directions" desc:"Settings for the directions command"`
+	Notes      *notes.Config      `key:"notes" desc:"Settings for the notes command"`
 }
 
-var configDir string
-var configFile string
+var configFilePath string
 var config *Configuration
 var configFileObject *os.File
 
+// Load should always be called initially to load
+// config file or create an empty one
 func Load() error {
 
+	// get the user's home dir
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return err
 	}
 
-	configDir = fmt.Sprintf("%s/%s", home, ConfigDirName)
-	configFile = fmt.Sprintf("%s/%s", configDir, ConfigFileName)
+	// set the full config file path
+	configFilePath = fmt.Sprintf("%s/%s/%s", home, ConfigDirName, ConfigFileName)
 
-	_, err = os.Stat(configFile)
-
-	if os.IsNotExist(err) {
-		config = getDefaultConfig()
-		WriteConfig()
-	} else if err {
+	// read or create config
+	err = loadConfig(config)
+	if err != nil {
 		return err
 	}
 
-	configFileObject = os.Open(configFile)
-
 	return nil
 }
 
-func Close() {
-	if configFileObject != nil {
-		configFileObject.Close()
-	}
-}
-
-func getDefaultConfig() *Configuration {
-	return &Configuration{
-		usb.ConfigDefaults,
-		directions.ConfigDefaults,
-		notes.ConfigDefaults,
-	}
-}
-
-func GetGroup(key string) interface{} {
-	return nil
-}
-
-func GetValue(key1 string, key2 string) interface{} {
-	return nil
-}
-
-func SetValue(key1 string, key2 string, value interface{}) bool {
-	return nil
-}
-
-func WriteConfig() error {
+// Save saves the config file to the filesystem
+func Save() error {
 
 	if config == nil {
 		return errors.New("Configuration has not yet been loaded")
 	}
 
+	err := writeConfig(config)
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func loadConfig(c *Configuration) error {
+
+	// check to see if the file exists
+	_, err := os.Stat(configFilePath)
+	if err != nil {
+
+		// if not, create default config and write the file
+		if os.IsNotExist(err) {
+			c = createConfig()
+			err = writeConfig(c)
+			if err != nil {
+				return err
+			}
+
+			// else return any other errors
+		} else {
+			return err
+		}
+		// if it exists, read in the config file
+	} else {
+		err = readConfig(c)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// read config file into memory
+func readConfig(c *Configuration) error {
+	var c *Configuration
+
+	// open file
+	f, err := os.Open(configFilePath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	// read file into bytes
+	b, err := ioutil.ReadAll(f)
+	if err != nil {
+		return err
+	}
+
+	// unmarshal bytes into struct
+	err = yaml.Unmarshal(b, c)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func writeConfig(c *Configuration) error {
+	f, err := os.Open(configFilePath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	b, err := yaml.Marshal(c)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Write(b)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func createConfig() *Configuration {
+	return &Configuration{
+		usb.ConfigDefaults,
+		directions.ConfigDefaults,
+		notes.ConfigDefaults,
+	}
 }
