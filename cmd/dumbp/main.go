@@ -22,13 +22,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	configPath := fmt.Sprintf("%s/%s", configFile)
-
-	config, exists, err := config.Load()
-	// err := godotenv.Load()
-	// if err != nil {
-	// panic("Error loading .env file")
-	// }
+	configPath := fmt.Sprintf("%s/%s", userDir, configFile)
+	config, exists, err := config.Load(configPath)
 
 	app := cli.NewApp()
 	app.Name = "dumbphone"
