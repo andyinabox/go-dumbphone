@@ -10,7 +10,7 @@ import (
 // DirectionsSubcommand Subcommand to get directions
 var ConfigSubcommand = cli.Command{
 	Name:    "config",
-	Usage:   "View and edit config",
+	Usage:   "View config settings",
 	Aliases: []string{"c"},
 	Action: func(c *cli.Context) error {
 
