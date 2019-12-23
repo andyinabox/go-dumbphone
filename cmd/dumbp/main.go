@@ -1,20 +1,55 @@
 package main
 
 import (
-	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/andyinabox/go-dumbphone/internal/commands"
-	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 	"github.com/urfave/cli"
 )
 
-const version = "0.1.2"
+const (
+	version    = "0.2.0"
+	configDir  = ".dumbp/"
+	configName = "config"
+	configExt  = "yml"
+)
 
 func main() {
-	err := godotenv.Load()
+
+	home, err := os.UserHomeDir()
 	if err != nil {
-		panic("Error loading .env file")
+		panic(err)
+	}
+	configPath := filepath.Join(home, configDir)
+
+	viper.SetConfigType("yaml")
+	viper.SetConfigName(configName)
+	viper.AddConfigPath(configPath)
+	// viper.AddConfigPath(".")
+
+	// try reading in config
+	if err := viper.ReadInConfig(); err != nil {
+		// if no config found, create one from the example file
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+
+			// try to create
+			err = createConfig(configPath, configName+"."+configExt, "./config.example.yml")
+			if err != nil {
+				panic(err)
+			}
+
+			// try reading in config again
+			err := viper.ReadInConfig()
+			if err != nil {
+				panic(err)
+			}
+
+			// panic for other errors
+		} else {
+			panic(err)
+		}
 	}
 
 	app := cli.NewApp()
@@ -22,14 +57,14 @@ func main() {
 	app.Usage = "A set of tools to make your dumbphone a little smarter"
 	app.Version = version
 	app.Commands = []cli.Command{
-		// directions
 		commands.DirectionsSubcommand,
 		commands.ReaderSubcommand,
 		commands.MarkdownSubcommand,
+		commands.ConfigSubcommand,
 	}
 
 	err = app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }

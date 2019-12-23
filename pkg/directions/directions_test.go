@@ -10,19 +10,23 @@ import (
 	"time"
 )
 
+const (
+	configDir  = ".dumbp/"
+	configName = "config"
+)
+
 var apiKey string
 
 func init() {
-	err := godotenv.Load("../../.env")
+	err := godotenv.Load("../../test/.env")
 	if err != nil {
-		panic("Error loading .env file")
+		panic("Unable to load testing .env file. Make sure you have test/.env set")
 	}
-	apiKey = os.Getenv("GOOGLE_API_KEY")
 }
 
 func defaultTrip() Trip {
 	trip := Trip{
-		APIKey:             apiKey,
+		APIKey:             os.Getenv("GOOGLE_API_KEY"),
 		Origin:             "300 Nicollet Mall, Minneapolis, MN",
 		Destination:        "90 W 4th St, St Paul, MN",
 		Mode:               "driving",
@@ -34,7 +38,7 @@ func defaultTrip() Trip {
 
 func previewB64(t *testing.T, b64 string) error {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
+	filename := fmt.Sprintf("%s/%s.html", os.TempDir(), timestamp)
 	html := fmt.Sprintf("<img src=\"data:image/png;base64,%s\">", b64)
 
 	f, err := os.Create(filename)
@@ -190,7 +194,7 @@ func TestBase64(t *testing.T) {
 
 func TestRenderDriving(t *testing.T) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
+	filename := fmt.Sprintf("%s/%s.html", os.TempDir(), timestamp)
 
 	f, err := os.Create(filename)
 	defer f.Close()
@@ -221,7 +225,7 @@ func TestRenderDriving(t *testing.T) {
 
 func TestRenderTransit(t *testing.T) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
+	filename := fmt.Sprintf("%s/%s.html", os.TempDir(), timestamp)
 
 	f, err := os.Create(filename)
 	defer f.Close()
@@ -253,7 +257,7 @@ func TestRenderTransit(t *testing.T) {
 
 func TestRenderBicycling(t *testing.T) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	filename := fmt.Sprintf("%s%s.html", os.TempDir(), timestamp)
+	filename := fmt.Sprintf("%s/%s.html", os.TempDir(), timestamp)
 
 	f, err := os.Create(filename)
 	defer f.Close()

@@ -1,10 +1,11 @@
 package utils
 
 import (
-	// "errors"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"time"
 )
@@ -55,7 +56,7 @@ func CreateTempFile(name string) (*os.File, error) {
 		name = Timestamp()
 	}
 
-	filename := fmt.Sprintf("%s%s.html", os.TempDir(), name)
+	filename := fmt.Sprintf("%s/%s.html", os.TempDir(), name)
 	f, err := os.Create(filename)
 	if err != nil {
 		return nil, err
@@ -71,14 +72,17 @@ func Timestamp() string {
 
 // OpenBrowser opens passed url in web browser
 func OpenBrowser(url string) error {
-	cmd := exec.Command("open", url)
 
-	err := cmd.Run()
-	if err != nil {
-		return err
+	switch runtime.GOOS {
+	case "linux":
+		return exec.Command("xdg-open", url).Start()
+	case "windows":
+		return exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		return exec.Command("open", url).Start()
 	}
 
-	return nil
+	return errors.New("Unsupported platform")
 }
 
 // BrowserSend open the given file in web browser
@@ -89,16 +93,14 @@ func BrowserSend(f *os.File) error {
 // BluetoothSend transfer the given file over bluetooth
 func BluetoothSend(f *os.File) error {
 
-	// open in Bluetooth File Exchange
-	// http://hints.macworld.com/article.php?story=20040413031046870
-	cmd := exec.Command("open", "-a", "/Applications/Utilities/Bluetooth File Exchange.app", f.Name())
-
-	err := cmd.Run()
-	if err != nil {
-		return err
+	switch runtime.GOOS {
+	case "linux":
+		return exec.Command("bluetooth-sendto", f.Name()).Start()
+	case "darwin":
+		return exec.Command("open", "-a", "/Applications/Utilities/Bluetooth File Exchange.app", f.Name()).Start()
 	}
 
-	return nil
+	return errors.New("Unsupported platform")
 }
 
 // USBSend transfer the given file over USB

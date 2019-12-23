@@ -1,0 +1,19 @@
+general:
+  # sync-on-mount: false
+modules:
+  directions:
+    home-address: ""
+    dir: "Directions"
+  notes:
+    dir: "Notes"
+  reader:
+    dir: "Reading"
+  # podcasts:
+services:
+  google:
+    api-key: ""
+  file-system:
+    mount: "/path/to/drive"
+  # clicksend:
+  # zapier:
+  # bluetooth:

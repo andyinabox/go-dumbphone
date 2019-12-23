@@ -3,14 +3,19 @@ package commands
 import (
 	"errors"
 	"fmt"
-	"os"
 	"strconv"
 	"time"
 
 	"github.com/andyinabox/go-dumbphone/internal/utils"
 	"github.com/andyinabox/go-dumbphone/pkg/directions"
 	"github.com/manifoldco/promptui"
+	"github.com/spf13/viper"
 	"github.com/urfave/cli"
+)
+
+const (
+	addressKey = "modules.directions.home-address"
+	apiKey     = "services.google.api-key"
 )
 
 // DirectionsSubcommand Subcommand to get directions
@@ -25,15 +30,34 @@ var DirectionsSubcommand = cli.Command{
 		)
 
 		var (
+			promptApiKey = func() (string, error) {
+				prompt := promptui.Prompt{
+					Label: "Google API Key",
+					Validate: func(input string) error {
+						return nil
+					},
+				}
+
+				return prompt.Run()
+			}
+
 			promptOrigin = func() (string, error) {
 				prompt := promptui.Prompt{
 					Label: "Origin",
 					Validate: func(input string) error {
 						return nil
 					},
-					Default: os.Getenv("DUMBP_HOME_ADDRESS"),
+					Default: viper.GetString(addressKey),
 				}
 
+				return prompt.Run()
+			}
+
+			promptSaveOrigin = func() (string, error) {
+				prompt := promptui.Prompt{
+					Label:     "Save this address as default?",
+					IsConfirm: true,
+				}
 				return prompt.Run()
 			}
 
@@ -124,9 +148,26 @@ var DirectionsSubcommand = cli.Command{
 			}
 		)
 
+		if !viper.IsSet(apiKey) || viper.GetString(apiKey) == "" {
+			key, err := promptApiKey()
+			if err != nil {
+				return err
+			}
+			viper.Set(apiKey, key)
+			viper.WriteConfig()
+		}
+
 		origin, err := promptOrigin()
 		if err != nil {
 			return err
+		}
+
+		if !viper.IsSet(addressKey) || viper.GetString(addressKey) == "" {
+			confirm, err := promptSaveOrigin()
+			if err == nil && confirm == "y" {
+				viper.Set(addressKey, origin)
+				viper.WriteConfig()
+			}
 		}
 
 		destination, err := promptDestination()
@@ -160,7 +201,7 @@ var DirectionsSubcommand = cli.Command{
 		}
 
 		trip := directions.Trip{
-			APIKey:             os.Getenv("GOOGLE_API_KEY"),
+			APIKey:             viper.GetString("services.google.api-key"),
 			Origin:             origin,
 			Destination:        destination,
 			Mode:               mode,
