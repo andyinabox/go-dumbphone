@@ -13,9 +13,10 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.2
 	github.com/sakirsensoy/genv v1.0.1
 	github.com/sergi/go-diff v1.0.0 // indirect
+	github.com/spf13/viper v1.6.1
 	github.com/stretchr/testify v1.3.0
 	github.com/urfave/cli v1.22.1
-	golang.org/x/net v0.0.0-20181220203305-927f97764cc3
+	golang.org/x/net v0.0.0-20190522155817-f3200d17e092
 	golang.org/x/time v0.0.0-20190921001708-c4c64cad1fd0 // indirect
 	googlemaps.github.io/maps v0.0.0-20191014172202-ce2e58e026c5
 	gopkg.in/russross/blackfriday.v2 v2.0.0
