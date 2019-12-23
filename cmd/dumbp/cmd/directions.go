@@ -1,13 +1,13 @@
-package commands
+package cmd
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"time"
 
-	"github.com/andyinabox/go-dumbphone/internal/utils"
 	"github.com/andyinabox/go-dumbphone/pkg/directions"
+	"github.com/andyinabox/go-dumbphone/pkg/transfer"
+	"github.com/andyinabox/go-dumbphone/pkg/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/viper"
 	"github.com/urfave/cli"
@@ -243,24 +243,11 @@ var DirectionsSubcommand = cli.Command{
 
 		switch index {
 		case 0:
-			err := utils.BluetoothSend(file)
-			if err != nil {
-				return err
-			}
-			break
+			return transfer.Send(file, transfer.BLUETOOTH_SEND, "")
 		case 1:
-			return errors.New("USB transfer not yet implemented")
-			// err := utils.USBSend(file)
-			// if err != nil {
-			// 	return err
-			// }
-			break
+			return transfer.Send(file, transfer.USB_SEND, viper.GetString("modules.directions.dir"))
 		case 2:
-			err := utils.BrowserSend(file)
-			if err != nil {
-				return err
-			}
-			break
+			return transfer.Send(file, transfer.BROWSER_SEND, "")
 		}
 
 		return nil

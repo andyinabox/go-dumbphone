@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/andyinabox/go-dumbphone/internal/commands"
+	"github.com/andyinabox/go-dumbphone/cmd/dumbp/cmd"
 	"github.com/spf13/viper"
 	"github.com/urfave/cli"
 )
@@ -57,10 +57,10 @@ func main() {
 	app.Usage = "A set of tools to make your dumbphone a little smarter"
 	app.Version = version
 	app.Commands = []cli.Command{
-		commands.DirectionsSubcommand,
-		commands.ReaderSubcommand,
-		commands.MarkdownSubcommand,
-		commands.ConfigSubcommand,
+		cmd.DirectionsSubcommand,
+		cmd.ReaderSubcommand,
+		cmd.MarkdownSubcommand,
+		cmd.ConfigSubcommand,
 	}
 
 	err = app.Run(os.Args)

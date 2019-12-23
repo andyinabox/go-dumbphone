@@ -3,7 +3,8 @@ package reader
 import (
 	"testing"
 
-	"github.com/andyinabox/go-dumbphone/internal/utils"
+	"github.com/andyinabox/go-dumbphone/pkg/browser"
+	"github.com/andyinabox/go-dumbphone/pkg/utils"
 )
 
 const (
@@ -47,7 +48,7 @@ func TestRender(t *testing.T) {
 	}
 
 	if testing.Verbose() {
-		err = utils.BrowserSend(f)
+		err = browser.OpenFile(f)
 		if err != nil {
 			t.Logf("Error opening in browser: %s", err)
 		}
