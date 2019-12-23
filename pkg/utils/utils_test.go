@@ -2,11 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"io/ioutil"
 	"os"
-	"sort"
 	"strconv"
 	"testing"
 	"time"
@@ -66,48 +62,48 @@ func TestTempFile(t *testing.T) {
 
 }
 
-func TestBluetoothSend(t *testing.T) {
+// func TestBluetoothSend(t *testing.T) {
 
-	if !testing.Verbose() {
-		t.SkipNow()
-	}
+// 	if !testing.Verbose() {
+// 		t.SkipNow()
+// 	}
 
-	f, err := CreateTempFile("")
-	defer f.Close()
-	if err != nil {
-		t.Errorf("Error creating file: %v", err)
-	}
+// 	f, err := CreateTempFile("")
+// 	defer f.Close()
+// 	if err != nil {
+// 		t.Errorf("Error creating file: %v", err)
+// 	}
 
-	err = BluetoothSend(f)
-	if err != nil {
-		t.Errorf("Error sending over BlueTooth: %v", err)
-	}
-}
+// 	err = BluetoothSend(f)
+// 	if err != nil {
+// 		t.Errorf("Error sending over BlueTooth: %v", err)
+// 	}
+// }
 
-func TestSortFilesByDate(t *testing.T) {
-	assert := assert.New(t)
-	require := require.New(t)
+// func TestSortFilesByDate(t *testing.T) {
+// 	assert := assert.New(t)
+// 	require := require.New(t)
 
-	dirname := Timestamp()
-	dirpath := fmt.Sprintf("%s/%s", os.TempDir(), dirname)
+// 	dirname := Timestamp()
+// 	dirpath := fmt.Sprintf("%s/%s", os.TempDir(), dirname)
 
-	files, err := CreateTempDirWithFiles(dirname, 5, 1000)
-	require.Nil(err)
+// 	files, err := CreateTempDirWithFiles(dirname, 5, 1000)
+// 	require.Nil(err)
 
-	fi, err := ioutil.ReadDir(dirpath)
-	require.Nil(err)
+// 	fi, err := ioutil.ReadDir(dirpath)
+// 	require.Nil(err)
 
-	sort.Sort(SortFilesByDate(fi))
+// 	sort.Sort(SortFilesByDate(fi))
 
-	assert.Equal(len(files), len(fi), "There should be the same number of FileInfo objects as files")
+// 	assert.Equal(len(files), len(fi), "There should be the same number of FileInfo objects as files")
 
-	for i := 1; i < len(fi); i++ {
-		mt1 := fi[i-1].ModTime()
-		mt2 := fi[i].ModTime()
-		// t.Logf("%v, %v", mt1.Unix(), mt2.Unix())
-		assert.True(mt2.Before(mt1), "File infos should be in order by time")
-	}
-}
+// 	for i := 1; i < len(fi); i++ {
+// 		mt1 := fi[i-1].ModTime()
+// 		mt2 := fi[i].ModTime()
+// 		// t.Logf("%v, %v", mt1.Unix(), mt2.Unix())
+// 		assert.True(mt2.Before(mt1), "File infos should be in order by time")
+// 	}
+// }
 
 // func TestBluetoothSend(t *testing.T) {
 
