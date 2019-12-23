@@ -13,7 +13,7 @@ import (
 )
 
 func CreateTempDirWithFiles(name string, n int, sleep int) ([]*os.File, error) {
-	dirname := fmt.Sprintf("%s%s", os.TempDir(), name)
+	dirname := fmt.Sprintf("%s/%s", os.TempDir(), name)
 
 	d, err := time.ParseDuration(strconv.Itoa(sleep) + "ms")
 	if err != nil {

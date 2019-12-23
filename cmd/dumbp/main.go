@@ -9,10 +9,12 @@ import (
 	"github.com/urfave/cli"
 )
 
-const version = "0.2.0"
-const configDir = ".dumbp/"
-const configName = "config"
-const configExt = "yml"
+const (
+	version    = "0.2.0"
+	configDir  = ".dumbp/"
+	configName = "config"
+	configExt  = "yml"
+)
 
 func main() {
 
