@@ -1,4 +1,4 @@
-package usbsync
+package utils
 
 import "os"
 

@@ -7,7 +7,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/andyinabox/go-dumbphone/internal/utils"
+	"github.com/andyinabox/go-dumbphone/pkg/utils"
 	"github.com/andyinabox/go-dumbphone/pkg/markdown"
 )
 
