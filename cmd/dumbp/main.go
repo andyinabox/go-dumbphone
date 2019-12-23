@@ -22,9 +22,10 @@ func main() {
 	}
 	configPath := filepath.Join(home, configDir)
 
+	viper.SetConfigType("yaml")
 	viper.SetConfigName(configName)
-	viper.AddConfigPath(".")
-	viper.AddConfigPath(filepath.Join(home, configPath))
+	viper.AddConfigPath(configPath)
+	// viper.AddConfigPath(".")
 
 	// try reading in config
 	if err := viper.ReadInConfig(); err != nil {
@@ -32,7 +33,7 @@ func main() {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 
 			// try to create
-			err = createConfig(configPath, configName+"."+configExt)
+			err = createConfig(configPath, configName+"."+configExt, "./config.example.yml")
 			if err != nil {
 				panic(err)
 			}
@@ -57,6 +58,7 @@ func main() {
 		commands.DirectionsSubcommand,
 		commands.ReaderSubcommand,
 		commands.MarkdownSubcommand,
+		commands.ConfigSubcommand,
 	}
 
 	err = app.Run(os.Args)

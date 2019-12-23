@@ -18,13 +18,16 @@ func TestCreateConfig(t *testing.T) {
 	testPath := "../../test/config/"
 	testFileName := "config.yml"
 	filePath := filepath.Join(testPath, testFileName)
+	configPath := "../../config.example.yml"
 
 	{
-		err := createConfig(testPath, testFileName)
+		err := createConfig(testPath, testFileName, configPath)
 		assert.Nil(err, "Expected no error executing createConfig")
 
 		_, err = os.Stat(filePath)
 		assert.False(os.IsNotExist(err), "File does not exist")
 		assert.Nil(err, "Some other file error")
 	}
+
+	os.RemoveAll(testPath)
 }

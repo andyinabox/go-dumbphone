@@ -6,20 +6,18 @@ import (
 	"path/filepath"
 )
 
-const ExampleConfig string = "../../config.example.yml"
-
-func createConfig(path string, name string) (err error) {
+func createConfig(path string, name string, configPath string) (err error) {
 
 	dstFile := filepath.Join(path, name)
 
 	// make config folder
-	err = os.MkdirAll(path, 0700)
+	err = os.MkdirAll(path, 0775)
 	if err != nil {
 		return
 	}
 
 	// open example config
-	in, err := os.Open(ExampleConfig)
+	in, err := os.Open(configPath)
 	if err != nil {
 		return
 	}
