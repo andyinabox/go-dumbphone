@@ -1,4 +1,4 @@
-package utils
+package transfer
 
 import (
 	"errors"
@@ -7,14 +7,6 @@ import (
 	"github.com/andyinabox/go-dumbphone/pkg/bluetooth"
 	"github.com/andyinabox/go-dumbphone/pkg/browser"
 	"github.com/andyinabox/go-dumbphone/pkg/usbsync"
-)
-
-type SendMethod int
-
-const (
-	BLUETOOTH_SEND SendMethod = iota
-	USB_SEND
-	BROWSER_SEND
 )
 
 func Send(f *os.File, method SendMethod, path string) error {

@@ -4,6 +4,7 @@ import (
 	"net/url"
 
 	"github.com/andyinabox/go-dumbphone/pkg/reader"
+	"github.com/andyinabox/go-dumbphone/pkg/transfer"
 	"github.com/andyinabox/go-dumbphone/pkg/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/viper"
@@ -80,11 +81,11 @@ var ReaderSubcommand = cli.Command{
 
 		switch index {
 		case 0:
-			return utils.Send(file, utils.BLUETOOTH_SEND, "")
+			return transfer.Send(file, transfer.BLUETOOTH_SEND, "")
 		case 1:
-			return utils.Send(file, utils.USB_SEND, viper.GetString("modules.reader.dir"))
+			return transfer.Send(file, transfer.USB_SEND, viper.GetString("modules.directions.dir"))
 		case 2:
-			return utils.Send(file, utils.BROWSER_SEND, "")
+			return transfer.Send(file, transfer.BROWSER_SEND, "")
 		}
 
 		return nil
