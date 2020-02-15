@@ -4,3 +4,4 @@ vendor/*
 node_modules
 config.yml
 test/.env
+bin/*
