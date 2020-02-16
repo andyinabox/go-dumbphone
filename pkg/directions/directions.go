@@ -94,7 +94,7 @@ func (t *Trip) Fetch() error {
 
 // Render generates an HTML file for the Trip and
 // renders to the given `io.Writer`
-func (t *Trip) Render(wr io.Writer, i int, templateFile string) error {
+func (t *Trip) Render(wr io.Writer, i int, tplData []byte) error {
 
 	// make sure routes have been fetched
 	err := t.checkForRoutes()
@@ -116,7 +116,7 @@ func (t *Trip) Render(wr io.Writer, i int, templateFile string) error {
 	polylineToB64 := func(polyline maps.Polyline) string {
 		str, err := t.PolyLineToB64(polyline)
 		if err != nil {
-			panic("Failed to convert polylin to Base64 image in template")
+			panic("Failed to convert polyline to Base64 image in template")
 		}
 		return str
 	}
@@ -133,7 +133,7 @@ func (t *Trip) Render(wr io.Writer, i int, templateFile string) error {
 	}
 
 	// parse template file
-	tpl, err := template.New("directions.html").Funcs(funcMap).ParseFiles(templateFile)
+	tpl, err := template.New("directions.html").Funcs(funcMap).Parse(string(tplData))
 	if err != nil {
 		return err
 	}

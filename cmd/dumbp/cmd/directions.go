@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/andyinabox/go-dumbphone/data"
 	"github.com/andyinabox/go-dumbphone/pkg/directions"
 	"github.com/andyinabox/go-dumbphone/pkg/transfer"
 	"github.com/andyinabox/go-dumbphone/pkg/utils"
@@ -24,10 +25,6 @@ var DirectionsSubcommand = cli.Command{
 	Usage:   "Get directions from Google Maps",
 	Aliases: []string{"d"},
 	Action: func(c *cli.Context) error {
-
-		const (
-			templateFile = "./pkg/directions/directions.html"
-		)
 
 		var (
 			promptApiKey = func() (string, error) {
@@ -231,7 +228,11 @@ var DirectionsSubcommand = cli.Command{
 		}
 		defer file.Close()
 
-		err = trip.Render(file, index, templateFile)
+		tpl, err := data.Asset("bin/data/directions.html")
+		if err != nil {
+			return err
+		}
+		err = trip.Render(file, index, tpl)
 		if err != nil {
 			return err
 		}

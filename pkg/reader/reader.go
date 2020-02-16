@@ -43,7 +43,7 @@ func New(url string) (Article, error) {
 }
 
 // Render writes rendered html to given `io.Writer`
-func (a *Article) Render(wr io.Writer, templateFile string) error {
+func (a *Article) Render(wr io.Writer, tplData []byte) error {
 
 	funcMap := template.FuncMap{
 		"unescape": func(s string) template.HTML {
@@ -51,7 +51,7 @@ func (a *Article) Render(wr io.Writer, templateFile string) error {
 		},
 	}
 
-	tpl, err := template.New("reader.html").Funcs(funcMap).ParseFiles(templateFile)
+	tpl, err := template.New("reader.html").Funcs(funcMap).Parse(string(tplData))
 	if err != nil {
 		return err
 	}

@@ -2,12 +2,14 @@ package directions
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"os"
 	"os/exec"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/andyinabox/go-dumbphone/data"
+	"github.com/joho/godotenv"
 )
 
 const (
@@ -210,7 +212,11 @@ func TestRenderDriving(t *testing.T) {
 		t.Errorf("Fetch Error: %v", err)
 	}
 
-	err = trip.Render(f, 0, "./directions.html")
+	tpl, err := data.Asset("bin/data/directions.html")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = trip.Render(f, 0, tpl)
 	if err != nil {
 		t.Errorf("Rendering error: %v", err)
 	}
@@ -242,7 +248,11 @@ func TestRenderTransit(t *testing.T) {
 		t.Errorf("Fetch Error: %v", err)
 	}
 
-	err = trip.Render(f, 0, "./directions.html")
+	tpl, err := data.Asset("bin/data/directions.html")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = trip.Render(f, 0, tpl)
 	if err != nil {
 		t.Errorf("Rendering error: %v", err)
 	}
@@ -275,7 +285,11 @@ func TestRenderBicycling(t *testing.T) {
 		t.Errorf("Fetch Error: %v", err)
 	}
 
-	err = trip.Render(f, 0, "./directions.html")
+	tpl, err := data.Asset("bin/data/directions.html")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = trip.Render(f, 0, tpl)
 	if err != nil {
 		t.Errorf("Rendering error: %v", err)
 	}

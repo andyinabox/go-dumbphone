@@ -5,10 +5,11 @@ go 1.13
 require (
 	github.com/PuerkitoBio/goquery v1.5.0
 	github.com/alexsasharegan/dotenv v0.0.0-20171113213728-090a4d1b5d42
+	github.com/go-bindata/go-bindata v3.1.2+incompatible // indirect
 	github.com/gomarkdown/markdown v0.0.0-20190912180731-281270bc6d83
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/joho/godotenv v1.3.0
-	github.com/labstack/echo/v4 v4.1.14 // indirect
+	github.com/labstack/echo/v4 v4.1.14
 	github.com/manifoldco/promptui v0.3.2
 	github.com/mauidude/go-readability v0.0.0-20141216012317-2f30b1a346f1
 	github.com/microcosm-cc/bluemonday v1.0.2

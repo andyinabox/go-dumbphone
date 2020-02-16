@@ -3,6 +3,7 @@ package cmd
 import (
 	"net/url"
 
+	"github.com/andyinabox/go-dumbphone/data"
 	"github.com/andyinabox/go-dumbphone/pkg/reader"
 	"github.com/andyinabox/go-dumbphone/pkg/transfer"
 	"github.com/andyinabox/go-dumbphone/pkg/utils"
@@ -17,10 +18,6 @@ var ReaderSubcommand = cli.Command{
 	Usage:   "Convert web page to readable text",
 	Aliases: []string{"r"},
 	Action: func(c *cli.Context) error {
-
-		const (
-			templateFile = "./pkg/reader/reader.html"
-		)
 
 		var (
 			promptURL = func() (string, error) {
@@ -69,7 +66,11 @@ var ReaderSubcommand = cli.Command{
 		}
 		defer file.Close()
 
-		err = article.Render(file, templateFile)
+		tpl, err := data.Asset("bin/data/reader.html")
+		if err != nil {
+			return err
+		}
+		err = article.Render(file, tpl)
 		if err != nil {
 			return err
 		}

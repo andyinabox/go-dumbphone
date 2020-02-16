@@ -3,6 +3,7 @@ package reader
 import (
 	"testing"
 
+	"github.com/andyinabox/go-dumbphone/data"
 	"github.com/andyinabox/go-dumbphone/pkg/browser"
 	"github.com/andyinabox/go-dumbphone/pkg/utils"
 )
@@ -42,7 +43,11 @@ func TestRender(t *testing.T) {
 		t.Fatalf("%s", err)
 	}
 
-	err = a.Render(f, "./reader.html")
+	tpl, err := data.Asset("bin/data/reader.html")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = a.Render(f, tpl)
 	if err != nil {
 		t.Fatalf("%s", err)
 	}
