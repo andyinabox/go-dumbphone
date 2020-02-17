@@ -17,5 +17,11 @@ paths:
           in: query
           name: format
           description: Can be either `json` or `html`
+    post:
+      summary: Post directions data
+      operationId: post-directions
+      responses:
+        '200':
+          description: OK
 components:
   schemas: {}
