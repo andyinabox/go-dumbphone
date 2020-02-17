@@ -15,5 +15,5 @@ build-cli: bindata
 build-api:
 	go build -o ./bin ./cmd/api
 
-install: build-cli
+install: test build-cli
 	sudo cp bin/dumbp /usr/local/bin/dumbp
