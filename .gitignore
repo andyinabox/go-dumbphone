@@ -5,5 +5,12 @@ node_modules
 config.yml
 test/.env
 
+# bin dir
 bin/*
+!bin/*.sh
 !bin/data/
+bin/data/data.go
+
+# test dir
+test/markdown/output.html
+test/notes_out

@@ -3,7 +3,7 @@ package reader
 import (
 	"testing"
 
-	"github.com/andyinabox/go-dumbphone/data"
+	"github.com/andyinabox/go-dumbphone/bin/data"
 	"github.com/andyinabox/go-dumbphone/pkg/browser"
 	"github.com/andyinabox/go-dumbphone/pkg/utils"
 )

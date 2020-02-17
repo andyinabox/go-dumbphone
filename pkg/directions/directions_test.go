@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andyinabox/go-dumbphone/data"
+	"github.com/andyinabox/go-dumbphone/bin/data"
 	"github.com/joho/godotenv"
 )
 

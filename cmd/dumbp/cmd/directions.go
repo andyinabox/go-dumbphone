@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/andyinabox/go-dumbphone/data"
+	"github.com/andyinabox/go-dumbphone/bin/data"
 	"github.com/andyinabox/go-dumbphone/pkg/directions"
 	"github.com/andyinabox/go-dumbphone/pkg/transfer"
 	"github.com/andyinabox/go-dumbphone/pkg/utils"

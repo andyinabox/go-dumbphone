@@ -3,7 +3,7 @@ package cmd
 import (
 	"net/url"
 
-	"github.com/andyinabox/go-dumbphone/data"
+	"github.com/andyinabox/go-dumbphone/bin/data"
 	"github.com/andyinabox/go-dumbphone/pkg/reader"
 	"github.com/andyinabox/go-dumbphone/pkg/transfer"
 	"github.com/andyinabox/go-dumbphone/pkg/utils"
