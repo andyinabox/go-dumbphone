@@ -8,7 +8,27 @@ This is a command-line tool for making my Alcatel A392CC flip phone just a littl
  - https://github.com/andyinabox/dumbp-gmap-directions
  - https://github.com/andyinabox/dumbp-read
 
-**Note:** For me this is a Go learner project so use at your own risk.
+To setup the project:
+
+```bash
+make setup
+```
+
+This will prompt you for your Google Maps API key, and install the `go-bindata` dependency
+
+To build:
+
+```bash
+make
+```
+
+To install into `/usr/local/bin` (requires `sudo` access):
+
+```bash
+make install
+```
+
+**Note:** This is a Go learner project so use at your own risk.
 
 # Goals
 

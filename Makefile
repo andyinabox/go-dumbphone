@@ -1,4 +1,4 @@
-default: build-cli
+default: test build-cli
 
 setup:
 	sh ./bin/setup.sh
