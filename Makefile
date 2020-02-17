@@ -1,4 +1,4 @@
-default: cli
+default: build-cli
 
 setup:
 	sh ./bin/setup.sh
@@ -9,8 +9,11 @@ test: bindata
 bindata:
 	go-bindata -pkg data -o ./bin/data/data.go ./bin/data/...
 
-cli: bindata
+build-cli: bindata
 	go build -o ./bin ./cmd/dumbp
 
-api:
+build-api:
 	go build -o ./bin ./cmd/api
+
+install: build-cli
+	sudo cp bin/dumbp /usr/local/bin/dumbp
