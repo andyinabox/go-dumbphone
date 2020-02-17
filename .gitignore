@@ -6,4 +6,4 @@ config.yml
 test/.env
 
 bin/*
-!bin/data/*
+!bin/data/

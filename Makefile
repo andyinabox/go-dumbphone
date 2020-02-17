@@ -1,6 +1,6 @@
 default: cli
 
-bindata:
+bindata: install-bindata
 	go-bindata -pkg data -o ./data/data.go ./bin/data/...
 
 cli: bindata
@@ -8,3 +8,6 @@ cli: bindata
 
 api:
 	go build -o ./bin ./cmd/api
+
+install-bindata:
+	go get -u github.com/go-bindata/go-bindata/...
